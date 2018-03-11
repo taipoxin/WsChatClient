@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace ChatClient
 {
 	/// <summary>
-	/// Логика взаимодействия для Startup.xaml
+	/// Логика взаимодействия для Signup.xaml
 	/// </summary>
-	public partial class Startup: Window
+	public partial class Signup: Window
 	{
-		public Startup()
+		public Signup()
 		{
 			InitializeComponent();
 		}

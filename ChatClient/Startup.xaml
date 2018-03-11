@@ -5,24 +5,24 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ChatClient"
       mc:Ignorable="d" 
-      Title="Startup" Width="762.667" Height="480" >
+      Title="Startup" Width="640" Height="480" >
 
-    <Grid Background="#FFF6F6F6">
-        <Grid HorizontalAlignment="Left" Height="262" Margin="68,52,0,0" VerticalAlignment="Top" Width="225">
-        
+    <Grid Background="White">
+        <Grid HorizontalAlignment="Center" Height="305" VerticalAlignment="Center" Width="266" Background="#FFF6F6F6">
+            <Label Content="Hello to chat" HorizontalAlignment="Center"  VerticalAlignment="Top" FontSize="22" Margin="27,15,106,0"/>
+            <Label Content="Please login to your account" HorizontalAlignment="Left" Margin="25,55,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+            <Label Content="Login" HorizontalAlignment="Left" Margin="25,86,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="25,117,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
+            <Label Content="Password" HorizontalAlignment="Left" Margin="25,154,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+            <PasswordBox HorizontalAlignment="Left" Height="23" Width="220" Margin="25,185,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Remember me" HorizontalAlignment="Left" Margin="25,227,0,0" VerticalAlignment="Top"/>
+            <Button Content="Sign in" HorizontalAlignment="Left" Margin="175,225,0,0" VerticalAlignment="Top" Width="70" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White"/>
+            <Label Content="Forgot password?" HorizontalAlignment="Left" Margin="141,154,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
+            <Label Content="Create an Account" HorizontalAlignment="Left" Margin="141,263,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
+            <Label Content="New to us?" HorizontalAlignment="Left" Margin="27,263,0,0" VerticalAlignment="Top"/>
+
         </Grid>
-        <Label Content="Hello to chat" HorizontalAlignment="Center"  VerticalAlignment="Top" FontSize="22" Margin="311,12,311,0"/>
-        <Label Content="Please login to your account" HorizontalAlignment="Left" Margin="311,57,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
-        <Label Content="Login" HorizontalAlignment="Left" Margin="311,88,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="311,119,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
-        <Label Content="Password" HorizontalAlignment="Left" Margin="311,156,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
-        <PasswordBox HorizontalAlignment="Left" Height="23" Width="220" Margin="311,187,0,0" VerticalAlignment="Top"/>
-        <CheckBox Content="Remember me" HorizontalAlignment="Left" Margin="311,229,0,0" VerticalAlignment="Top"/>
-        <Button Content="Sign in" HorizontalAlignment="Left" Margin="461,227,0,0" VerticalAlignment="Top" Width="70" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White"/>
-        <Label Content="Forgot password?" HorizontalAlignment="Left" Margin="427,156,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
-        <Label Content="Create an Account" HorizontalAlignment="Left" Margin="427,265,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
-        <Label Content="New to us?" HorizontalAlignment="Left" Margin="313,265,0,0" VerticalAlignment="Top"/>
-        
+
 
     </Grid>
 </Window>
