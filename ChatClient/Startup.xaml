@@ -16,10 +16,11 @@
             <Label Content="Password" HorizontalAlignment="Left" Margin="25,154,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
             <PasswordBox HorizontalAlignment="Left" Height="23" Width="220" Margin="25,185,0,0" VerticalAlignment="Top"/>
             <CheckBox Content="Remember me" HorizontalAlignment="Left" Margin="25,227,0,0" VerticalAlignment="Top"/>
-            <Button Content="Sign in" HorizontalAlignment="Left" Margin="175,225,0,0" VerticalAlignment="Top" Width="70" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White"/>
+            <Button Content="Sign in" HorizontalAlignment="Left" Margin="139,225,0,0" VerticalAlignment="Top" Width="106
+                    " Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White"/>
             <Label Content="Forgot password?" HorizontalAlignment="Left" Margin="141,154,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
-            <Label Content="Create an Account" HorizontalAlignment="Left" Margin="141,263,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
             <Label Content="New to us?" HorizontalAlignment="Left" Margin="27,263,0,0" VerticalAlignment="Top"/>
+            <Label Content="Create an Account" HorizontalAlignment="Left" Margin="141,263,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
 
         </Grid>
 

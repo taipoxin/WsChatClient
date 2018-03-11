@@ -8,18 +8,18 @@
       Title="Signup" Width="640" Height="480" >
 
     <Grid Background="White">
-        <Grid HorizontalAlignment="Center" Height="319" VerticalAlignment="Center" Width="269" Background="#FFF6F6F6">
-            <Label Content="Create your account" HorizontalAlignment="Left"  VerticalAlignment="Top" FontSize="22" Margin="27,15,21,0" Width="218"/>
-            <Label Content="Login" HorizontalAlignment="Left" Margin="25,60,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
-            <TextBox HorizontalAlignment="Left" Height="23" Margin="25,86,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
-            <Label Content="Password" HorizontalAlignment="Left" Margin="25,168,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
-            <PasswordBox HorizontalAlignment="Left" Height="23" Width="220" Margin="25,194,0,0" VerticalAlignment="Top"/>
-            <Button Content="Sign up" HorizontalAlignment="Left" Margin="139,282,0,0" VerticalAlignment="Top" Width="106" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White"/>
-            <Label Content="Email" HorizontalAlignment="Left" Margin="25,114,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
-            <TextBox HorizontalAlignment="Left" Height="23" Margin="25,140,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
-            <Label Content="Confirm Password" HorizontalAlignment="Left" Margin="25,222,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
-            <PasswordBox HorizontalAlignment="Left" Height="23" Width="220" Margin="25,248,0,0" VerticalAlignment="Top"/>
-            <Button Content="Cancel" HorizontalAlignment="Left" Margin="27,282,0,0" VerticalAlignment="Top" Width="106" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C"/>
+        <Grid HorizontalAlignment="Center" Height="305" VerticalAlignment="Center" Width="266" Background="#FFF6F6F6">
+            <Label Content="Create your account" HorizontalAlignment="Left"  VerticalAlignment="Top" FontSize="22" Margin="27,5,0,0" Width="218"/>
+            <Label Content="Login" HorizontalAlignment="Left" Margin="25,48,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="25,74,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
+            <Label Content="Email" HorizontalAlignment="Left" Margin="25,102,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+            <TextBox HorizontalAlignment="Left" Height="23" Margin="25,128,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
+            <Label Content="Password" HorizontalAlignment="Left" Margin="25,156,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+            <PasswordBox HorizontalAlignment="Left" Height="23" Width="220" Margin="25,182,0,0" VerticalAlignment="Top"/>
+            <Label Content="Confirm Password" HorizontalAlignment="Left" Margin="25,210,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+            <PasswordBox HorizontalAlignment="Left" Height="23" Width="220" Margin="25,236,0,0" VerticalAlignment="Top"/>
+            <Button Content="Sign up" HorizontalAlignment="Left" Margin="139,270,0,0" VerticalAlignment="Top" Width="106" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White"/>
+            <Button Content="Cancel" HorizontalAlignment="Left" Margin="27,270,0,0" VerticalAlignment="Top" Width="106" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C"/>
 
         </Grid>
 
