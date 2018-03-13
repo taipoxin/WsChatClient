@@ -5,8 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChatClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Width="1280" Height="720">
     <Grid>
-        
+        <StackPanel Width="374" Height="680" HorizontalAlignment="Left" Margin="0,5,0,5.4">
+            <ToggleButton Background="Blue" Height="80" Content="1" />
+            <ToggleButton Background="White" Height="80" Content="2" />
+            <ToggleButton Background="Red" Height="80" Content="3" />
+            <ToggleButton Background="Blue" Height="80" Content="1" />
+            <ToggleButton Background="White" Height="80" Content="2" />
+            <ToggleButton Background="Red" Height="80" Content="3" />
+            <ToggleButton Background="Blue" Height="80" Content="1" />
+            <ToggleButton Background="White" Height="80" Content="2" />
+            <ToggleButton Background="Red" Height="80" Content="3" />
+        </StackPanel>
     </Grid>
 </Window>
