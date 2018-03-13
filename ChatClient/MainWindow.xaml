@@ -7,36 +7,63 @@
         mc:Ignorable="d"
         Title="MainWindow" Width="1280" Height="720">
     <Grid>
-        <Grid Width="374" Height="80" HorizontalAlignment="Center" Background="#FFFFE8E8">
-            <TextBlock Name="ChannelName" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
-        </Grid>
         <Grid HorizontalAlignment="Left">
 
             <ListBox Name="channelList" HorizontalAlignment="Left" 
                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ToggleButton Background="Blue" Width="374"  Height="80" Content="1" />
-                <ToggleButton Background="White" Width="374" Height="80" Content="2" />
-                <ToggleButton Background="Red" Width="374" Height="80" Content="3" />
-                <ToggleButton Background="Blue" Width="374" Height="80" Content="1" />
-                <ToggleButton Background="White" Width="374" Height="80" Content="2" />
-                <ToggleButton Background="Red"  Width="374" Height="80" Content="3" />
-                <ToggleButton Background="Blue" Width="374" Height="80" Content="1" />
-                <ToggleButton Background="White" Width="374" Height="80" Content="2" />
-                <ToggleButton Background="Red"  Width="374" Height="80" Content="3" />
-                <ToggleButton Background="Blue" Width="374" Height="80" Content="1" />
-                <ToggleButton Background="White" Width="374" Height="80" Content="2" />
-                <ToggleButton Background="Red"  Width="374" Height="80" Content="3" />
-                <ToggleButton Background="Blue" Width="374" Height="80" Content="1" />
-                <ToggleButton Background="White" Width="374" Height="80" Content="2" />
-                <ToggleButton Background="Red"  Width="374" Height="80" Content="3" />
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="#FFDAADD7">
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
             </ListBox>
         </Grid>
-        <TextBlock HorizontalAlignment="Left" Margin="462,349,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
-        <Grid HorizontalAlignment="Right"  VerticalAlignment="Bottom" Width="881" Height="74" Margin="0,0,-0.4,0.4">
-            <TextBox HorizontalAlignment="Left" Height="43" TextWrapping="Wrap" Text="Какой то текст в одну строку" VerticalAlignment="Bottom" Margin="0,0,0,5" Width="822" FontSize="14" FontFamily="Tahoma" MaxLines="10" MaxLength="50"/>
+        <Grid HorizontalAlignment="Right"  VerticalAlignment="Bottom" Width="881" Height="690" Margin="0,0,-0.4,0.4" Background="#FFFFE3B0">
+            <ListBox HorizontalAlignment="Left" Height="642" VerticalAlignment="Top" Width="875" Background="#FFD3E5B4"/>
+            <TextBox HorizontalAlignment="Left" Height="43" TextWrapping="Wrap" Text="Какой то текст в одну строку" VerticalAlignment="Bottom" Margin="0,0,0,5" Width="822" FontSize="14" FontFamily="Tahoma" MaxLines="10" MaxLength="50" Background="#FFE0CCCC"/>
             <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5"/>
         </Grid>
+
     </Grid>
 </Window>
