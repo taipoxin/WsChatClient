@@ -29,7 +29,7 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        
+
         <!-- шаблоны элементов -->
         <Grid Name="SampleGrid" Width="374" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
             <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
@@ -44,7 +44,7 @@
             <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
             <TextBlock Grid.Row="1" HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="some message dddddddddddddddddddddddddddddddddddddddddddddddddd" VerticalAlignment="Top"  Width="300" FontFamily="Tahoma" FontSize="14"/>
         </Grid>
-        
+
         <Grid Grid.Column="0">
             <!-- список каналов -->
             <ListBox Name="ChannelList" HorizontalAlignment="Left" 
@@ -60,8 +60,13 @@
         </Grid>
         <!-- область чата -->
         <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFFFE3B0">
+            <!-- шапка канала -->
+            <Grid Background="#FF8CFF0C" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55">
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ChannelName" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="количество участников" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14"/>
+            </Grid>
             <!-- список сообщений -->
-            <ListBox Name="MessageList" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,0,0,55"
+            <ListBox Name="MessageList" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,55,0,55"
                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <Grid Width="374" VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
@@ -69,7 +74,7 @@
                         <RowDefinition Height="32"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
                     <TextBlock Grid.Row="1" HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="some message dddddddddddddddddddddddddddddddddddddddddddddddddd" VerticalAlignment="Top"  Width="300" FontFamily="Tahoma" FontSize="14"/>
                 </Grid>
             </ListBox>
@@ -79,6 +84,6 @@
                 <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
             </Grid>
         </Grid>
-        
+
     </Grid>
 </Window>

@@ -80,9 +80,12 @@ namespace ChatClient
 		{
 			if (e.Key == Key.Return)
 			{
-				string username = "me";
-				MessageList.Items.Add(createMessageGrid(username, MessageTextBox.Text));
-				MessageTextBox.Text = "";
+				if (MessageTextBox.Text != "")
+				{
+					string username = "me";
+					MessageList.Items.Add(createMessageGrid(username, MessageTextBox.Text));
+					MessageTextBox.Text = "";
+				}
 			}
 		}
 	}

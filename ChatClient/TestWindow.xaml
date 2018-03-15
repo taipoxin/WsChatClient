@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="TestWindow" Height="720" Width="1280">
     <Window.Resources>
+        <!-- Предложение ввода текста в TextBox -->
         <ControlTemplate x:Key="TextBoxTemplate" TargetType="{x:Type TextBox}">
             <Border Name="Border" CornerRadius="2" Padding="2"
                     Background="#FFFFFF" BorderBrush="#888888" BorderThickness="1" >
@@ -28,12 +29,24 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+       
+        <!-- шаблоны элементов -->
         <Grid Name="SampleGrid" Width="374" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
             <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
             <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
             <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
         </Grid>
+        <Grid Name="MessageGrid" Width="374" VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+            <TextBlock Grid.Row="1" HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="some message dddddddddddddddddddddddddddddddddddddddddddddddddd" VerticalAlignment="Top"  Width="300" FontFamily="Tahoma" FontSize="14"/>
+        </Grid>
+
         <Grid Grid.Column="0">
+            <!-- список каналов -->
             <ListBox Name="ChannelList" HorizontalAlignment="Left" 
                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="#FFDAADD7">
@@ -45,12 +58,30 @@
                 </Grid>
             </ListBox>
         </Grid>
-
+        <!-- область чата -->
         <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFFFE3B0">
-            <ListBox HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,0,0,55"/>
+            <!-- шапка канала -->
+            <Grid Background="#FF8CFF0C" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55">
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ChannelName" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="количество участников" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14"/>
+            </Grid>
+            <!-- список сообщений -->
+            <ListBox Name="MessageList" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,55,0,55"
+                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <Grid Width="374" VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="some message dddddddddddddddddddddddddddddddddddddddddddddddddd" VerticalAlignment="Top"  Width="300" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+            </ListBox>
+            <!-- поля для ввода текста -->
             <Grid Background="#FFFF0C0C" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Height="55">
-                <TextBox Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC"/>
-                <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5"/>
+                <TextBox Name="MessageTextBox" Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC" KeyDown="TextBox_KeyDown"/>
+                <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
             </Grid>
         </Grid>
     </Grid>
