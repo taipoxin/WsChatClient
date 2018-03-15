@@ -22,13 +22,17 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
-
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        <Grid Name="SampleGrid" Width="374" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
+            <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+            <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+            <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+        </Grid>
         <Grid Grid.Column="0">
             <ListBox Name="ChannelList" HorizontalAlignment="Left" 
                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
@@ -41,7 +45,7 @@
                 </Grid>
             </ListBox>
         </Grid>
-        
+
         <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFFFE3B0">
             <ListBox HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,0,0,55"/>
             <Grid Background="#FFFF0C0C" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Height="55">
@@ -50,7 +54,4 @@
             </Grid>
         </Grid>
     </Grid>
-    <!--
-    
-    -->
 </Window>
