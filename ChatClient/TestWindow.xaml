@@ -43,9 +43,11 @@
         </Grid>
         
         <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFFFE3B0">
-            <ListBox HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,0,0,50"/>
-            <TextBox Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC"/>
-            <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5"/>
+            <ListBox HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,0,0,55"/>
+            <Grid Background="#FFFF0C0C" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Height="55">
+                <TextBox Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC"/>
+                <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5"/>
+            </Grid>
         </Grid>
     </Grid>
     <!--
