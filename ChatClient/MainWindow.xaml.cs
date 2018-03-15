@@ -38,7 +38,7 @@ namespace ChatClient
 		 */
 		private Grid createChannelGrid(string name, int newM, int users)
 		{
-			var g1 = GenericsWPF<Grid>.DeepDarkCopy(sampleGrid);
+			var g1 = GenericsWPF<Grid>.DeepDarkCopy(SampleGrid);
 			g1.Visibility = Visibility.Visible;
 			var ch = g1.Children;
 			((TextBlock)ch[0]).Text = name;
@@ -51,7 +51,7 @@ namespace ChatClient
 		private int indx = 1;
 		private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			channelList.Items.Add(createChannelGrid("канал " + indx, 2+indx, 5+indx));
+			ChannelList.Items.Add(createChannelGrid("канал " + indx, 2+indx, 5+indx));
 			indx++;
 		}
 	}
