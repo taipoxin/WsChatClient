@@ -25,8 +25,28 @@
 
     </Window.Resources>
     <Grid>
-        <TextBox Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Left" Height="75" Margin="111,99,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="286"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <ListBox Name="ChannelList" HorizontalAlignment="Left" 
+                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="#FFDAADD7">
 
+                <Grid Width="374" Height="80" Background="#FFFFE8E8">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+            </ListBox>
+        </Grid>
+        
+        <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFFFE3B0">
+            <ListBox HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4"/>
+            <TextBox Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC"/>
+            <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5"/>
+        </Grid>
     </Grid>
     <!--
     
