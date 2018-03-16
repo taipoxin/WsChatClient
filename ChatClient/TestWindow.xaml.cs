@@ -43,11 +43,15 @@ namespace ChatClient
 		}
 
 		private int indx = 1;
-		private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		private void EllipseChannels_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			ChannelList.Items.Add(createChannelGrid("канал " + indx, 2 + indx, 5 + indx));
 			indx++;
 		}
+
+
+
+
 
 
 		/*
@@ -60,14 +64,23 @@ namespace ChatClient
             <TextBlock Grid.Row="1" HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="some message dddddddddddddddddddddddddddddddddddddddddddddddddd" VerticalAlignment="Top"  Width="300" FontFamily="Tahoma" FontSize="14"/>
         </Grid>
 		 */
-		private Grid createMessageGrid(string name, string message)
+		private Grid createMessageGrid(string name, string message, Grid obj)
 		{
-			var g1 = GenericsWPF<Grid>.DeepDarkCopy(MessageGrid);
+			var g1 = GenericsWPF<Grid>.DeepDarkCopy(obj);
 			g1.Visibility = Visibility.Visible;
 			var ch = g1.Children;
 			((TextBlock)ch[0]).Text = name;
 			((TextBlock)ch[1]).Text = message;
 			return g1;
+		}
+
+		private Grid createMyMessageGrid(string name, string message)
+		{
+			return createMessageGrid(name, message, MyMessageGrid);
+		}
+		private Grid createAnotherMessageGrid(string name, string message)
+		{
+			return createMessageGrid(name, message, AnotherMessageGrid);
 		}
 
 
@@ -78,10 +91,19 @@ namespace ChatClient
 				if (MessageTextBox.Text != "")
 				{
 					string username = "me";
-					MessageList.Items.Add(createMessageGrid(username, MessageTextBox.Text));
+					MessageList.Items.Add(createMyMessageGrid(username, MessageTextBox.Text));
 					MessageTextBox.Text = "";
 				}
 			}
+		}
+
+		private int indxx = 1;
+		private void EllipseMessage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			string username = "Somebody";
+			string message = "какое-то сообщение номер " + indxx;
+			MessageList.Items.Add(createAnotherMessageGrid(username, message));
+			indxx++;
 		}
 	}
 }

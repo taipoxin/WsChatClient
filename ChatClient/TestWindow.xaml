@@ -68,7 +68,7 @@
                 </Grid>
 
             </ListBox>
-            <Ellipse Fill="#FF2BF051" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
+            <Ellipse Fill="#FF2BF051" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="EllipseChannels_MouseLeftButtonDown"/>
         </Grid>
         <!-- область чата -->
         <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFFFE3B0">
@@ -80,7 +80,8 @@
             <!-- список сообщений -->
             <ListBox Name="MessageList" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="#FFD3E5B4" Margin="0,55,0,55"
                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+                
                 <!-- сообщение -->
                 <Grid HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
                     <Grid.RowDefinitions>
@@ -90,20 +91,39 @@
                     <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
                     <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
                 </Grid>
+                
                 <Grid HorizontalAlignment="Right" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+
+                <Grid HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="32"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some longer more longer message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                </Grid>
+
+                <Grid HorizontalAlignment="Right" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some longer message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some longer more longer message some longer more longer message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
                 </Grid>
 
             </ListBox>
             <!-- поля для ввода текста -->
             <Grid Background="#FFFF0C0C" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Height="55">
                 <TextBox Name="MessageTextBox" Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC" KeyDown="TextBox_KeyDown"/>
-                <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown"/>
+                <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="EllipseMessage_MouseLeftButtonDown"/>
             </Grid>
         </Grid>
     </Grid>
