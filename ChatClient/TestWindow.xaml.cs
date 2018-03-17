@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 
 namespace ChatClient
 {
@@ -29,16 +32,7 @@ namespace ChatClient
 		// using when send user's messages
 		private string userIdentification = "Me";
 
-
-
-
-		/*
-		 <Grid Width="374" Height="80" Background="#FFFFE8E8">
-            <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных трейдеров" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
-            <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
-        </Grid>
-		 */
+		
 		private Grid createChannelGrid(string name, int newM, int users)
 		{
 			var g1 = GenericsWPF<Grid>.DeepDarkCopy(ChannelSampleGrid);
@@ -51,6 +45,7 @@ namespace ChatClient
 		}
 
 		private int indx = 1;
+
 		private void EllipseChannels_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			ChannelList.Items.Add(createChannelGrid("канал " + indx, 2 + indx, 5 + indx));
@@ -58,20 +53,6 @@ namespace ChatClient
 		}
 
 
-
-
-
-
-		/*
-		 <Grid Name="ChannelSampleGrid" Width="374" VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="32"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock Grid.Row="1" HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="some message dddddddddddddddddddddddddddddddddddddddddddddddddd" VerticalAlignment="Top"  Width="300" FontFamily="Tahoma" FontSize="14"/>
-        </Grid>
-		 */
 
 		/**
 		 * low level method, return grid object with needed parameters
@@ -96,16 +77,20 @@ namespace ChatClient
 			return createMessageGrid(name, message, time, AnotherMessageGrid);
 		}
 
+
 		private string getCurrentDatenTime()
 		{
 			return DateTime.Now.ToString(@"dd\.MM HH\:mm");
 		}
-
 		private string getCurrentTime()
 		{
 			return DateTime.Now.ToString(@"HH\:mm");
 		}
 
+		private void ScrollMessageListToEnd()
+		{
+			MessageList.ScrollIntoView(MessageList.Items[MessageList.Items.Count - 1]);
+		}
 
 		private void TextBox_KeyDown(object sender, KeyEventArgs e)
 		{
@@ -121,20 +106,80 @@ namespace ChatClient
 			}
 		}
 
-		private void ScrollMessageListToEnd()
+		
+
+		
+		private string WriteFromObject(MessageBean bean)
 		{
-			MessageList.ScrollIntoView(MessageList.Items[MessageList.Items.Count - 1]);
+			//Create a stream to serialize the object to.  
+			MemoryStream ms = new MemoryStream();
+
+			// Serializer the User object to the stream.  
+			DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MessageBean));
+			ser.WriteObject(ms, bean);
+			byte[] json = ms.ToArray();
+			ms.Close();
+			return Encoding.UTF8.GetString(json, 0, json.Length);
 		}
 
-		private int indxx = 1;
+		private string WriteFromArrayOfObjectsToJson(MessageBean[] beans)
+		{
+			return JsonConvert.SerializeObject(beans);
+		}
+
+		// Deserialize a JSON stream to a User object.  
+		private MessageBean ReadToObject(string json)
+		{
+			MessageBean deserializedBean;
+			MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
+			DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MessageBean));
+			deserializedBean = ser.ReadObject(ms) as MessageBean;
+			ms.Close();
+			return deserializedBean;
+		}
+
+		private MessageBean MessageGridToObject(Grid messageGrid)
+		{
+			var ch = messageGrid.Children;
+			string sender =  ((TextBlock)ch[0]).Text;
+			string message = ((TextBlock)ch[1]).Text;
+			string time =    ((TextBlock)ch[2]).Text;
+			return new MessageBean(sender, message, time);
+		}
+
+
+		private void SerialiseMessage(Grid messageGrid)
+		{
+			var ch = messageGrid.Children;
+			string sender =  ((TextBlock)ch[0]).Text;
+			string message = ((TextBlock)ch[1]).Text;
+			string time =    ((TextBlock)ch[2]).Text;
+			MessageBean messageBean = new MessageBean(sender, message, time);
+			string json = WriteFromObject(messageBean);
+			System.IO.File.WriteAllText("Object.json", json);
+
+		}
+
+		private MessageBean[] MessageListGridsToObjectArray()
+		{
+			int count = MessageList.Items.Count;
+			MessageBean[] beans = new MessageBean[count];
+			for (int i = 0; i < count; i++)
+			{
+				MessageBean b = MessageGridToObject((Grid)MessageList.Items[i]);
+				beans[i] = b;
+			}
+			return beans;
+		}
+
+		// TODO: дописать как для итеративности добавлять много обьектов в json
+		// TODO: также дописать сохранение в файл
 		private void EllipseMessage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			string username = "Somebody";
-			string message = "какое-то сообщение номер " + indxx;
-			string time = getCurrentTime();
-			MessageList.Items.Add(createAnotherMessageGrid(username, message, time));
-			ScrollMessageListToEnd();
-			indxx++;
+			MessageBean[] beans = MessageListGridsToObjectArray();
+			string beansJ = WriteFromArrayOfObjectsToJson(beans);
+			File.WriteAllText("MessageList.json", beansJ);
+
 		}
 
 		// if ChannelGrid state is Collapsed
@@ -236,15 +281,11 @@ namespace ChatClient
 			{
 				throw new Exception("target cannot be null");
 			}
-
-			
 		}
 
 
 		private void ChannelList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			//MessageList.Items.Add(createAnotherMessageGrid("clicked", ((TextBlock)((Grid)e.AddedItems[0]).Children[0]).Text));
-
 			Grid channel = (Grid) e.AddedItems[0];
 			TextBlock nameBlock = (TextBlock)channel.Children[0];
 			TextBlock countBlock = (TextBlock)channel.Children[2];
