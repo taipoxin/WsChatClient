@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChatClient"
         mc:Ignorable="d"
-        Title="TestWindow" Height="720" Width="1280">
+        Title="TestWindow" Width="1280" Height="720" MinWidth="750" MinHeight="520">
     <Window.Resources>
         <!-- Предложение ввода текста в TextBox -->
         <ControlTemplate x:Key="TextBoxTemplate" TargetType="{x:Type TextBox}">
@@ -24,26 +24,32 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
     </Window.Resources>
-    <Grid>
+    <Grid SizeChanged="Grid_SizeChanged">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
        
         <!-- шаблоны элементов -->
-        <Grid Name="SampleGrid" HorizontalAlignment="Stretch" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
+        <!-- Visible должна быть Collapsed -->
+        <Grid Name="ChannelSampleGrid" HorizontalAlignment="Stretch" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
             <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
             <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
             <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
         </Grid>
         <!-- сообщение -->
-        <Grid Name="AnotherMessageGrid" HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
+        <Grid  Name="AnotherMessageGrid" HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+            <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
         </Grid>
         <!-- сообщение -->
         <Grid Name="MyMessageGrid" HorizontalAlignment="Right" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
@@ -51,15 +57,22 @@
                 <RowDefinition Height="32"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+            <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
         </Grid>
-
-        <Grid Grid.Column="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFED2828" >
+        <!-- конец шаблонов -->
+        
+        
+        <Grid Name="ChannelGrid" Grid.Column="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFED2828" Visibility="Visible">
             <!-- список каналов -->
             <ListBox Name="ChannelList" HorizontalAlignment="Stretch" Width="374" 
                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="#FFDAADD7">
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="#FFDAADD7" SelectionChanged="ChannelList_SelectionChanged">
 
                 <Grid HorizontalAlignment="Stretch" Height="80" Background="#FFFFE8E8">
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
@@ -72,8 +85,11 @@
         </Grid>
         <!-- область чата -->
         <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FFFFE3B0">
+            <!-- кнопка сворачивания списка каналов -->
+            <Rectangle Width="55" Height="55" VerticalAlignment="Top" HorizontalAlignment="Left" Fill="#FF455BFF" Stroke="#FF8C85FF" MouseLeftButtonDown="BackRect_MouseLeftButtonDown"/>
+                
             <!-- шапка канала -->
-            <Grid Background="#FF8CFF0C" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55">
+            <Grid Name="ChatHeader"  Background="#FF8CFF0C" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55" Margin="55,0,0,0">
                 <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ChannelName" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
                 <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="количество участников" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14"/>
             </Grid>
@@ -88,17 +104,27 @@
                         <RowDefinition Height="32"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message dfdfdfdfhgh" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
                 </Grid>
-                
+
                 <Grid HorizontalAlignment="Right" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="32"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
                 </Grid>
 
                 <Grid HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
@@ -106,17 +132,27 @@
                         <RowDefinition Height="32"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some longer more longer message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some longer more longer message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
                 </Grid>
-
+                
                 <Grid HorizontalAlignment="Right" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Visible">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="32"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-                    <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some longer more longer message some longer more longer message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some longer more longer message some longer more longer message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
                 </Grid>
 
             </ListBox>
