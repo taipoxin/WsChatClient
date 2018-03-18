@@ -24,6 +24,8 @@ namespace ChatClient
 			InitializeComponent();
 		}
 
+		private WsController wsController;
+
 		private double leftPos;
 		private double topPos;
 		private bool isPosition = false;
@@ -42,6 +44,12 @@ namespace ChatClient
 				this.Left = leftPos;
 				this.Top = topPos;
 			}
+		}
+
+		public void setWsController(WsController c)
+		{
+			c.setSignupWindow(this);
+			wsController = c;
 		}
 
 

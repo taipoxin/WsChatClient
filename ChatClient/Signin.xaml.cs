@@ -29,7 +29,8 @@ namespace ChatClient
 			InitializeComponent();
 		}
 
-		private WebSocket ws;
+		private WsController wsController;
+		private FileLogger l = new FileLogger("signin.txt");
 
 		private double leftPos;
 		private double topPos;
@@ -60,52 +61,42 @@ namespace ChatClient
 				this.Top = getCenter(SystemParameters.PrimaryScreenHeight, ActualHeight);
 				this.Left= getCenter(SystemParameters.PrimaryScreenWidth, ActualWidth);
 			}
-			// init ws
-			ws = initWebSocket();
-			StreamWriter writer = new StreamWriter("wsLog.txt", false);
+			// init wsController
+			wsController = initWsController();
 
+			// init file
+			l.log("", false);
 		}
 
-		private void log(string s)
+		private WsController initWsController()
 		{
-			StreamWriter writer = new StreamWriter("wsLog.txt", true);
-			writer.WriteLine(s);
-			writer.Close();
+			WsController c = new WsController();
+			c.setSigninWindow(this);
+			return c;
 		}
 
-		private WebSocket initWebSocket()
+		public void setWsController(WsController c)
 		{
-			WebSocket ws = new WebSocket(Config.wsSource);
-			ws.OnMessage += (sender, e) =>
+			c.setSigninWindow(this);
+			wsController = c;
+		}
+
+
+		public void dispatchOpenMainWindow()
+		{
+			Dispatcher.BeginInvoke(new ThreadStart(delegate
 			{
-				AuthResponse resp = JsonConvert.DeserializeObject<AuthResponse>(e.Data);
-				if ("authorize".Equals(resp.type))
-				{
-					// успешная авторизация
-					if (resp.success)
-					{
-						log("success");
-						Dispatcher.BeginInvoke(new ThreadStart(delegate
-						{
-							openMainWindow();
-						}));
-					}
-				}
-			};
-
-			ws.Connect();
-			return ws;
+				openMainWindow();
+			}));
 		}
 
 
-		private void openMainWindow()
+		public void openMainWindow()
 		{
-			// в конце отображаем окно
 			TestWindow w = new TestWindow();
-			// показываем новое окно
+			w.setWsController(wsController);
 			w.Show();
 
-			// закрываем текущее окно логина
 			var window = Application.Current.Windows[0];
 			if (window != null)
 			{
@@ -117,10 +108,9 @@ namespace ChatClient
 		{
 			Signup w = new Signup();
 			w.SetWindowPositions(this.Left, this.Top);
-			// показываем новое окно
+			w.setWsController(wsController);
 			w.Show();
 
-			// закрываем текущее окно логина
 			var window = Application.Current.Windows[0];
 			if (window != null)
 				window.Close();
@@ -144,7 +134,8 @@ namespace ChatClient
 				string u = UserBox.Text;
 				string p = PasswordBox.Password;
 				string jsonReq = JsonConvert.SerializeObject(createRequest(u, p));
-				ws.Send(jsonReq);
+				l.log("sending auth request");
+				wsController.getWs().Send(jsonReq);
 			}
 			else
 			{

@@ -34,8 +34,14 @@ namespace ChatClient
 		// using when send user's messages
 		private string userIdentification = "Me";
 
+		private WsController wsController;
 
-		
+
+		public void setWsController(WsController c)
+		{
+			c.setMainWindow(this);
+			wsController = c;
+		}
 
 
 		private Grid createChannelGrid(string name, int newM, int users)
