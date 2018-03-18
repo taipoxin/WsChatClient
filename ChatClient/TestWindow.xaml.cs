@@ -35,9 +35,7 @@ namespace ChatClient
 		private string userIdentification = "Me";
 
 
-		private string httpSource = "localhost:3000";
-		private string wsSource = "ws://localhost:9000";
-
+		
 
 
 		private Grid createChannelGrid(string name, int newM, int users)
@@ -265,7 +263,7 @@ namespace ChatClient
 		//TODO: websocketClient
 		private void wsClientTest()
 		{
-			using (var ws = new WebSocket(wsSource))
+			using (var ws = new WebSocket(Config.wsSource))
 			{
 				ws.OnMessage += (sender, e) =>
 					Console.WriteLine("Laputa says: " + e.Data);
@@ -369,6 +367,17 @@ namespace ChatClient
 				var response = client.GetAsync("/api/values").Result;
 				return response.Content.ReadAsStringAsync().Result;
 			}
+		}
+
+		private double getCenter(double resolution, double actual)
+		{
+			return (resolution - actual) / 2;
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			this.Top = getCenter(SystemParameters.PrimaryScreenHeight, ActualHeight);
+			this.Left = getCenter(SystemParameters.PrimaryScreenWidth, ActualWidth);
 		}
 	}
 }

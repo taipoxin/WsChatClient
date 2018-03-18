@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChatClient"
         mc:Ignorable="d"
-        Title="TestWindow" Width="1280" Height="720" MinWidth="750" MinHeight="520">
+        Title="TestWindow" Width="1280" Height="720" MinWidth="750" MinHeight="520" Loaded="Window_Loaded">
     <Window.Resources>
         <!-- Предложение ввода текста в TextBox -->
         <ControlTemplate x:Key="TextBoxTemplate" TargetType="{x:Type TextBox}">

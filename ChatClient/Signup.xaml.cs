@@ -23,5 +23,68 @@ namespace ChatClient
 		{
 			InitializeComponent();
 		}
+
+		private double leftPos;
+		private double topPos;
+		private bool isPosition = false;
+
+		public void SetWindowPositions(double left, double top)
+		{
+			leftPos = left;
+			topPos = top;
+			isPosition = true;
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (isPosition)
+			{
+				this.Left = leftPos;
+				this.Top = topPos;
+			}
+		}
+
+
+		private void formData()
+		{
+			string login = LoginBox.Text;
+			string email = EmailBox.Text;
+
+			string pass = PasswordBox.Password;
+			string cpass = ConfirmBox.Password;
+
+		}
+
+		// Cancel
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			Signin w = new Signin();
+			w.SetWindowPositions(this.Left, this.Top);
+			// показываем новое окно
+			w.Show();
+
+			// закрываем текущее окно логина
+			var window = Application.Current.Windows[0];
+			if (window != null)
+				window.Close();
+
+		}
+
+
+		// Sign up
+		private void Button_Click_1(object sender, RoutedEventArgs e)
+		{
+			Signin w = new Signin();
+			w.SetWindowPositions(this.Left, this.Top);
+			// показываем новое окно
+			w.Show();
+
+			// закрываем текущее окно логина
+			var window = Application.Current.Windows[0];
+			if (window != null)
+				window.Close();
+		}
+
+		
 	}
 }

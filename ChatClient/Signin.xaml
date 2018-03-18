@@ -1,0 +1,24 @@
+﻿<Window x:Class="ChatClient.Signin"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ChatClient"
+      mc:Ignorable="d" 
+      Title="Signin" Width="266" Height="340" Loaded="Window_Loaded" >
+
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="266" Background="#FFF6F6F6">
+        <Label Content="Hello to chat" HorizontalAlignment="Center"  VerticalAlignment="Top" FontSize="22" Margin="27,15,106,0"/>
+        <Label Content="Please login to your account" HorizontalAlignment="Left" Margin="25,55,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+        <Label Content="Login" HorizontalAlignment="Left" Margin="25,86,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+        <TextBox Name="UserBox" HorizontalAlignment="Left" Height="23" Margin="25,117,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
+        <Label Content="Password" HorizontalAlignment="Left" Margin="25,154,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+        <PasswordBox Name="PasswordBox" HorizontalAlignment="Left" Height="23" Width="220" Margin="25,185,0,0" VerticalAlignment="Top"/>
+        <CheckBox Name="RememberCheck" Content="Remember me" HorizontalAlignment="Left" Margin="25,227,0,0" VerticalAlignment="Top"/>
+        <Button Content="Sign in" HorizontalAlignment="Left" Margin="139,225,0,0" VerticalAlignment="Top" Width="106
+                    " Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White" Click="Button_Click"/>
+        <Label Content="Forgot password?" HorizontalAlignment="Left" Margin="141,154,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE"/>
+        <Label Content="New to us?" HorizontalAlignment="Left" Margin="27,263,0,0" VerticalAlignment="Top"/>
+        <Label Content="Create an Account" HorizontalAlignment="Left" Margin="141,263,0,0" VerticalAlignment="Top" Foreground="#FF2E76EE" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
+    </Grid>
+</Window>
