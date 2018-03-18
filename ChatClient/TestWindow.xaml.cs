@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
+using WebSocketSharp;
 
 namespace ChatClient
 {
@@ -32,7 +34,12 @@ namespace ChatClient
 		// using when send user's messages
 		private string userIdentification = "Me";
 
-		
+
+		private string httpSource = "localhost:3000";
+		private string wsSource = "ws://localhost:9000";
+
+
+
 		private Grid createChannelGrid(string name, int newM, int users)
 		{
 			var g1 = GenericsWPF<Grid>.DeepDarkCopy(ChannelSampleGrid);
@@ -106,37 +113,11 @@ namespace ChatClient
 			}
 		}
 
-		
-
-		
-		private string WriteFromObject(MessageBean bean)
-		{
-			//Create a stream to serialize the object to.  
-			MemoryStream ms = new MemoryStream();
-
-			// Serializer the User object to the stream.  
-			DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MessageBean));
-			ser.WriteObject(ms, bean);
-			byte[] json = ms.ToArray();
-			ms.Close();
-			return Encoding.UTF8.GetString(json, 0, json.Length);
-		}
-
 		private string WriteFromArrayOfObjectsToJson(MessageBean[] beans)
 		{
 			return JsonConvert.SerializeObject(beans);
 		}
-
-		// Deserialize a JSON stream to a User object.  
-		private MessageBean ReadToObject(string json)
-		{
-			MessageBean deserializedBean;
-			MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(json));
-			DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(MessageBean));
-			deserializedBean = ser.ReadObject(ms) as MessageBean;
-			ms.Close();
-			return deserializedBean;
-		}
+		
 
 		private MessageBean MessageGridToObject(Grid messageGrid)
 		{
@@ -146,19 +127,7 @@ namespace ChatClient
 			string time =    ((TextBlock)ch[2]).Text;
 			return new MessageBean(sender, message, time);
 		}
-
-
-		private void SerialiseMessage(Grid messageGrid)
-		{
-			var ch = messageGrid.Children;
-			string sender =  ((TextBlock)ch[0]).Text;
-			string message = ((TextBlock)ch[1]).Text;
-			string time =    ((TextBlock)ch[2]).Text;
-			MessageBean messageBean = new MessageBean(sender, message, time);
-			string json = WriteFromObject(messageBean);
-			System.IO.File.WriteAllText("Object.json", json);
-
-		}
+		
 
 		private MessageBean[] MessageListGridsToObjectArray()
 		{
@@ -291,6 +260,115 @@ namespace ChatClient
 			TextBlock countBlock = (TextBlock)channel.Children[2];
 
 			changeHeader(nameBlock, countBlock);
+		}
+
+		//TODO: websocketClient
+		private void wsClientTest()
+		{
+			using (var ws = new WebSocket(wsSource))
+			{
+				ws.OnMessage += (sender, e) =>
+					Console.WriteLine("Laputa says: " + e.Data);
+
+				ws.Connect();
+				ws.Send("BALUS");
+				Console.ReadKey(true);
+			}
+		}
+
+
+		//TODO: разобрать все методы ниже в соответсвии с задачами
+		void mMain()
+		{
+			Task t = new Task(DownloadPageAsync);
+			t.Start();
+			Console.WriteLine("Downloading page...");
+			Console.ReadLine();
+		}
+
+		async void DownloadPageAsync()
+		{
+			// ... Target page.
+			string page = "http://en.wikipedia.org/";
+
+			// ... Use HttpClient.
+			using (HttpClient client = new HttpClient())
+			using (HttpResponseMessage response = await client.GetAsync(page))
+			using (HttpContent content = response.Content)
+			{
+				// ... Read the string.
+				string result = await content.ReadAsStringAsync();
+				
+			}
+		}
+
+		// регистрация
+		static string Register(string email, string password)
+		{
+			var registerModel = new {
+				Email = email,
+				Password = password,
+				ConfirmPassword = password
+			};
+			using (var client = new HttpClient())
+			{
+				var response = client.PostAsJsonAsync("/api/Account/Register", registerModel).Result;
+				return response.StatusCode.ToString();
+			}
+		}
+		// получение токена
+		static Dictionary<string, string> GetTokenDictionary(string userName, string password)
+		{
+			var pairs = new List<KeyValuePair<string, string>>
+				{
+					new KeyValuePair<string, string>( "grant_type", "password" ),
+					new KeyValuePair<string, string>( "username", userName ),
+					new KeyValuePair<string, string> ( "Password", password )
+				};
+			var content = new FormUrlEncodedContent(pairs);
+
+			using (var client = new HttpClient())
+			{
+				var response =
+					client.PostAsync("/Token", content).Result;
+				var result = response.Content.ReadAsStringAsync().Result;
+				// Десериализация полученного JSON-объекта
+				Dictionary<string, string> tokenDictionary =
+					JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
+				return tokenDictionary;
+			}
+		}
+
+		// создаем http-клиента с токеном 
+		static HttpClient CreateClient(string accessToken = "")
+		{
+			var client = new HttpClient();
+			if (!string.IsNullOrWhiteSpace(accessToken))
+			{
+				client.DefaultRequestHeaders.Authorization =
+					new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+			}
+			return client;
+		}
+
+		// получаем информацию о клиенте 
+		static string GetUserInfo(string token)
+		{
+			using (var client = CreateClient(token))
+			{
+				var response = client.GetAsync("/api/Account/UserInfo").Result;
+				return response.Content.ReadAsStringAsync().Result;
+			}
+		}
+
+		// обращаемся по маршруту api/values 
+		static string GetValues(string token)
+		{
+			using (var client = CreateClient(token))
+			{
+				var response = client.GetAsync("/api/values").Result;
+				return response.Content.ReadAsStringAsync().Result;
+			}
 		}
 	}
 }

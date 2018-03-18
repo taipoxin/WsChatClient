@@ -24,7 +24,10 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
     </Window.Resources>
-    <Grid>
+    
+    
+    
+    <Grid Visibility="Collapsed">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
