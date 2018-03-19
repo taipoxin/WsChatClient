@@ -15,11 +15,18 @@ namespace ChatClient
 		{
 			file = f;
 		}
-
+		// with \n
 		public void log(string s, bool toEnd)
 		{
 			StreamWriter writer = new StreamWriter(file, toEnd);
 			writer.WriteLine(s);
+			writer.Close();
+		}
+		// without \n
+		public void logg(string s, bool toEnd)
+		{
+			StreamWriter writer = new StreamWriter(file, toEnd);
+			writer.Write(s);
 			writer.Close();
 		}
 

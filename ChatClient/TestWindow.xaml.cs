@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,7 +36,7 @@ namespace ChatClient
 		private string userIdentification = "Me";
 
 		private WsController wsController;
-
+		private FileLogger l = new FileLogger("signin.txt");
 
 		public void setWsController(WsController c)
 		{
@@ -111,6 +112,11 @@ namespace ChatClient
 				{
 					string time = getCurrentTime();
 					MessageList.Items.Add(createMyMessageGrid(MessageTextBox.Text, time));
+					MessageResponse mes = new MessageResponse("message", MessageTextBox.Text, Config.userName, DateTimeOffset.Now.ToUnixTimeMilliseconds());
+					string jsonReq = JsonConvert.SerializeObject(mes);
+					l.log("sending message");
+					wsController.getWs().Send(jsonReq);
+
 					MessageTextBox.Text = "";
 					ScrollMessageListToEnd();
 				}
@@ -143,6 +149,28 @@ namespace ChatClient
 				beans[i] = b;
 			}
 			return beans;
+		}
+
+		public void dispatchShowMessage(MessageResponse mes)
+		{
+			Dispatcher.BeginInvoke(new ThreadStart(delegate {
+				showMessage(mes);
+			}));
+		}
+
+
+		public void showMessage(MessageResponse mes)
+		{
+			Grid mGrid;
+			if (mes.@from.Equals(Config.userName))
+			{
+				mGrid = createMyMessageGrid(mes.message, getCurrentTime());
+			}
+			else
+			{
+				mGrid = createAnotherMessageGrid(mes.@from, mes.message, getCurrentTime());
+			}
+			MessageList.Items.Add(mGrid);
 		}
 
 		// TODO: дописать как для итеративности добавлять много обьектов в json

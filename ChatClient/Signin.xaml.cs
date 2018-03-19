@@ -65,7 +65,7 @@ namespace ChatClient
 			wsController = initWsController();
 
 			// init file
-			l.log("", false);
+			l.logg("", false);
 		}
 
 		private WsController initWsController()
@@ -132,6 +132,7 @@ namespace ChatClient
 			if (RememberCheck.IsChecked != null && (bool)RememberCheck.IsChecked)
 			{
 				string u = UserBox.Text;
+				Config.userName = u;
 				string p = PasswordBox.Password;
 				string jsonReq = JsonConvert.SerializeObject(createRequest(u, p));
 				l.log("sending auth request");
@@ -152,18 +153,5 @@ namespace ChatClient
 
 	}
 
-	public class AuthResponse
-	{
-		public string type;
-		public bool success;
-		public string[] online;
-	}
-
-	public class AuthRequest
-	{
-		public string type;
-		public string user;
-		public string password;
-
-	}
+	
 }
