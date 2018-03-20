@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ChatClient"
       mc:Ignorable="d" 
-      Title="Signin" Width="266" Height="340" Loaded="Window_Loaded" >
+      Title="Signin" Width="266" Height="340" Loaded="Window_Loaded">
 
     <Grid HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="266" Background="#FFF6F6F6">
         <Label Content="Hello to chat" HorizontalAlignment="Center"  VerticalAlignment="Top" FontSize="22" Margin="27,15,106,0"/>

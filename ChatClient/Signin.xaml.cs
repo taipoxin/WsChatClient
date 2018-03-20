@@ -50,6 +50,7 @@ namespace ChatClient
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			l.logg("", false);
 			if (isPosition)
 			{
 				this.Left = leftPos;
@@ -61,11 +62,9 @@ namespace ChatClient
 				this.Top = getCenter(SystemParameters.PrimaryScreenHeight, ActualHeight);
 				this.Left= getCenter(SystemParameters.PrimaryScreenWidth, ActualWidth);
 			}
-			// init wsController
+			//init wsController
 			wsController = initWsController();
-
-			// init file
-			l.logg("", false);
+			Visibility = Visibility.Visible;
 		}
 
 		private WsController initWsController()
@@ -135,13 +134,37 @@ namespace ChatClient
 				Config.userName = u;
 				string p = PasswordBox.Password;
 				string jsonReq = JsonConvert.SerializeObject(createRequest(u, p));
-				l.log("sending auth request");
-				wsController.getWs().Send(jsonReq);
+				
+				WebSocket w = wsController.getWs();
+				// пытаемся отправить сообщение об авторизации
+				if (w != null && w.IsAlive)
+				{
+					l.log("sending auth request");
+					w.Send(jsonReq);
+				}
+				// если не получается, то 
+				else
+				{
+					l.log("auth fail");
+					Thread t = new Thread(delegate() { checkConnectAndSendRequest(w, jsonReq); });
+					t.IsBackground = true;
+					t.Start();
+				}
 			}
 			else
 			{
 				openMainWindow();
 			}
+		}
+
+		private void checkConnectAndSendRequest(WebSocket w, String jsonReq)
+		{
+			while (w == null || w.IsAlive)
+			{
+				Thread.Sleep(100);
+			}
+			l.log("sending auth request");
+			w.Send(jsonReq);
 		}
 
 		// Create account

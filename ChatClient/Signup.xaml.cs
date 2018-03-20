@@ -93,6 +93,5 @@ namespace ChatClient
 				window.Close();
 		}
 
-		
 	}
 }

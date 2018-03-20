@@ -38,7 +38,10 @@ namespace ChatClient
 
 		public WsController()
 		{
-			ws = initWebSocket();
+			Thread t = new Thread(new ThreadStart(initWs));
+			t.IsBackground = true;
+			t.Start();
+			//ws = initWebSocket();
 			// init file
 			l.logg("", false);
 		}
@@ -47,12 +50,17 @@ namespace ChatClient
 		{
 			return ws;
 		}
-		
 
+		private void initWs()
+		{
+			ws = initWebSocket();
+		}
 		
 		private WebSocket initWebSocket()
 		{
 			WebSocket ws = new WebSocket(Config.wsSource);
+
+
 			ws.OnMessage += (sender, e) => {
 
 
@@ -79,15 +87,30 @@ namespace ChatClient
 					while (mainWindow == null)
 					{
 						l.log("another sleep");
-						Thread.Sleep(300);
+						Thread.Sleep(100);
 					}
 					mainWindow.dispatchShowMessage(m);
 				}
-				
+			};
+			// establish again
+			ws.OnError += (sender, e) =>
+			{
+				l.log("error: " + e.Message);
+				tryToConnect(ws);
 			};
 
-			ws.Connect();
+			tryToConnect(ws);
 			return ws;
+		}
+
+		private void tryToConnect(WebSocket ws)
+		{
+			while (!ws.IsAlive)
+			{
+				// about 2 second to connect
+				ws.Connect(); ;
+			}
+			l.log("ws connected");
 		}
 
 		private MessageResponse dynamicToMessageResponse(dynamic obj)

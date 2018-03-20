@@ -171,10 +171,9 @@ namespace ChatClient
 				mGrid = createAnotherMessageGrid(mes.@from, mes.message, getCurrentTime());
 			}
 			MessageList.Items.Add(mGrid);
+			ScrollMessageListToEnd();
 		}
 
-		// TODO: дописать как для итеративности добавлять много обьектов в json
-		// TODO: также дописать сохранение в файл
 		private void EllipseMessage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			MessageBean[] beans = MessageListGridsToObjectArray();
@@ -294,115 +293,11 @@ namespace ChatClient
 			changeHeader(nameBlock, countBlock);
 		}
 
-		//TODO: websocketClient
-		private void wsClientTest()
-		{
-			using (var ws = new WebSocket(Config.wsSource))
-			{
-				ws.OnMessage += (sender, e) =>
-					Console.WriteLine("Laputa says: " + e.Data);
-
-				ws.Connect();
-				ws.Send("BALUS");
-				Console.ReadKey(true);
-			}
-		}
-
-
-		//TODO: разобрать все методы ниже в соответсвии с задачами
-		void mMain()
-		{
-			Task t = new Task(DownloadPageAsync);
-			t.Start();
-			Console.WriteLine("Downloading page...");
-			Console.ReadLine();
-		}
-
-		async void DownloadPageAsync()
-		{
-			// ... Target page.
-			string page = "http://en.wikipedia.org/";
-
-			// ... Use HttpClient.
-			using (HttpClient client = new HttpClient())
-			using (HttpResponseMessage response = await client.GetAsync(page))
-			using (HttpContent content = response.Content)
-			{
-				// ... Read the string.
-				string result = await content.ReadAsStringAsync();
-				
-			}
-		}
-
-		// регистрация
-		static string Register(string email, string password)
-		{
-			var registerModel = new {
-				Email = email,
-				Password = password,
-				ConfirmPassword = password
-			};
-			using (var client = new HttpClient())
-			{
-				var response = client.PostAsJsonAsync("/api/Account/Register", registerModel).Result;
-				return response.StatusCode.ToString();
-			}
-		}
-		// получение токена
-		static Dictionary<string, string> GetTokenDictionary(string userName, string password)
-		{
-			var pairs = new List<KeyValuePair<string, string>>
-				{
-					new KeyValuePair<string, string>( "grant_type", "password" ),
-					new KeyValuePair<string, string>( "username", userName ),
-					new KeyValuePair<string, string> ( "Password", password )
-				};
-			var content = new FormUrlEncodedContent(pairs);
-
-			using (var client = new HttpClient())
-			{
-				var response =
-					client.PostAsync("/Token", content).Result;
-				var result = response.Content.ReadAsStringAsync().Result;
-				// Десериализация полученного JSON-объекта
-				Dictionary<string, string> tokenDictionary =
-					JsonConvert.DeserializeObject<Dictionary<string, string>>(result);
-				return tokenDictionary;
-			}
-		}
-
-		// создаем http-клиента с токеном 
-		static HttpClient CreateClient(string accessToken = "")
-		{
-			var client = new HttpClient();
-			if (!string.IsNullOrWhiteSpace(accessToken))
-			{
-				client.DefaultRequestHeaders.Authorization =
-					new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
-			}
-			return client;
-		}
-
-		// получаем информацию о клиенте 
-		static string GetUserInfo(string token)
-		{
-			using (var client = CreateClient(token))
-			{
-				var response = client.GetAsync("/api/Account/UserInfo").Result;
-				return response.Content.ReadAsStringAsync().Result;
-			}
-		}
-
-		// обращаемся по маршруту api/values 
-		static string GetValues(string token)
-		{
-			using (var client = CreateClient(token))
-			{
-				var response = client.GetAsync("/api/values").Result;
-				return response.Content.ReadAsStringAsync().Result;
-			}
-		}
-
+		/**
+		 * get center position, if 
+		 * @resolution is the full length of pixels
+		 * @actual - size of app in pixels
+		*/ 
 		private double getCenter(double resolution, double actual)
 		{
 			return (resolution - actual) / 2;
@@ -410,8 +305,10 @@ namespace ChatClient
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			// center Window after loaded
 			this.Top = getCenter(SystemParameters.PrimaryScreenHeight, ActualHeight);
 			this.Left = getCenter(SystemParameters.PrimaryScreenWidth, ActualWidth);
 		}
+
 	}
 }
