@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,6 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
+using WebSocketSharp;
 
 namespace ChatClient
 {
@@ -25,6 +28,7 @@ namespace ChatClient
 		}
 
 		private WsController wsController;
+		private FileLogger l = new FileLogger("signup.txt");
 
 		private double leftPos;
 		private double topPos;
@@ -39,6 +43,7 @@ namespace ChatClient
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			l.logg("", false);
 			if (isPosition)
 			{
 				this.Left = leftPos;
@@ -52,19 +57,68 @@ namespace ChatClient
 			wsController = c;
 		}
 
-
-		private void formData()
+		private RegRequest createRegRequest(string user, string email, string password)
 		{
-			string login = LoginBox.Text;
-			string email = EmailBox.Text;
+			RegRequest r = new RegRequest();
+			r.type = "register";
+			r.user = user;
+			r.email = email;
+			r.password = password;
+			return r;
+		}
 
+		// return success
+		private bool registerFromForm()
+		{
+			string user = LoginBox.Text;
+			string email = EmailBox.Text;
 			string pass = PasswordBox.Password;
 			string cpass = ConfirmBox.Password;
 
+			if (!pass.Equals(cpass))
+			{
+				return false;
+			}
+			string jsonReq = JsonConvert.SerializeObject(createRegRequest(user, email, pass));
+
+			WebSocket w = wsController.getWs();
+			// пытаемся отправить сообщение об регистрации
+			if (w != null && w.IsAlive)
+			{
+				l.log("sending auth request");
+				w.Send(jsonReq);
+			}
+			// если не получается, то траим
+			else
+			{
+				l.log("reg fail");
+				Thread t = new Thread(delegate() { checkConnectAndSendRequest(w, jsonReq); });
+				t.IsBackground = true;
+				t.Start();
+			}
+			return true;
+
 		}
 
-		// Cancel
-		private void Button_Click(object sender, RoutedEventArgs e)
+		private void checkConnectAndSendRequest(WebSocket w, String jsonReq)
+		{
+			while (w == null && w.IsAlive)
+			{
+				Thread.Sleep(100);
+			}
+			l.log("sending auth request");
+			w.Send(jsonReq);
+		}
+
+		public void dispatchOpenSigninWindow()
+		{
+			Dispatcher.BeginInvoke(new ThreadStart(delegate {
+				openSigninWindow();
+			}));
+		}
+
+
+		private void openSigninWindow()
 		{
 			Signin w = new Signin();
 			w.SetWindowPositions(this.Left, this.Top);
@@ -75,6 +129,12 @@ namespace ChatClient
 			var window = Application.Current.Windows[0];
 			if (window != null)
 				window.Close();
+		}
+
+		// Cancel
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			openSigninWindow();
 
 		}
 
@@ -82,15 +142,17 @@ namespace ChatClient
 		// Sign up
 		private void Button_Click_1(object sender, RoutedEventArgs e)
 		{
-			Signin w = new Signin();
-			w.SetWindowPositions(this.Left, this.Top);
-			// показываем новое окно
-			w.Show();
 
-			// закрываем текущее окно логина
-			var window = Application.Current.Windows[0];
-			if (window != null)
-				window.Close();
+			bool res = registerFromForm();
+			if (res)
+			{
+				l.log("try to register");
+			}
+			else
+			{
+				l.log("bad data for register");
+			}
+
 		}
 
 	}

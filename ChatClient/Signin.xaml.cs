@@ -159,7 +159,7 @@ namespace ChatClient
 
 		private void checkConnectAndSendRequest(WebSocket w, String jsonReq)
 		{
-			while (w == null || w.IsAlive)
+			while (w == null && w.IsAlive)
 			{
 				Thread.Sleep(100);
 			}

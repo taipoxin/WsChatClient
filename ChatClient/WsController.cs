@@ -68,21 +68,26 @@ namespace ChatClient
 
 
 				string type = resp.type;
+
 				if ("authorize".Equals(type))
 				{
 					bool success = resp.success;
-					l.log("s: " + success);
+					l.log("new auth: " + success);
 					if (success)
 					{
 						l.log("success auth");
 						signinWindow.dispatchOpenMainWindow();
+					}
+					else
+					{
+						l.log("bad data for user");
 					}
 				}
 				
 				// пришло новое сообщение - отображаем в списке сообщений
 				else if ("message".Equals(type))
 				{
-					l.log("test message");
+					l.log("new message");
 					MessageResponse m = dynamicToMessageResponse(resp);
 					while (mainWindow == null)
 					{
@@ -91,6 +96,26 @@ namespace ChatClient
 					}
 					mainWindow.dispatchShowMessage(m);
 				}
+
+				else if ("register".Equals(type))
+				{
+					l.log("registration answer");
+					bool success = resp.success;
+					if (success)
+					{
+						while (signupWindow == null)
+						{
+							l.log("another sleep");
+							Thread.Sleep(100);
+						}
+						signupWindow.dispatchOpenSigninWindow();
+					}
+					else
+					{
+						l.log("user already exists");
+					}
+				}
+
 			};
 			// establish again
 			ws.OnError += (sender, e) =>
@@ -128,6 +153,20 @@ namespace ChatClient
 	public class CommonResponse
 	{
 		public string type;
+	}
+
+	public class RegRequest
+	{
+		public string type;
+		public string user;
+		public string email;
+		public string password;
+	}
+
+	public class RegResponse
+	{
+		public string type;
+		public bool success;
 	}
 
 	public class AuthResponse
