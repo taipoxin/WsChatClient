@@ -28,7 +28,7 @@ namespace ChatClient
 		}
 
 		private WsController wsController;
-		private FileLogger l = new FileLogger("signup.txt");
+		private FileLogger l = new FileLogger(Config.logFileName);
 
 		private double leftPos;
 		private double topPos;
@@ -43,7 +43,7 @@ namespace ChatClient
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			l.logg("", false);
+			//l.logg("", false);
 			if (isPosition)
 			{
 				this.Left = leftPos;
@@ -102,7 +102,7 @@ namespace ChatClient
 
 		private void checkConnectAndSendRequest(WebSocket w, String jsonReq)
 		{
-			while (w == null && w.IsAlive)
+			while (w == null || w.IsAlive)
 			{
 				Thread.Sleep(100);
 			}

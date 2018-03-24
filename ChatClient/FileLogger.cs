@@ -18,15 +18,27 @@ namespace ChatClient
 		// with \n
 		public void log(string s, bool toEnd)
 		{
+			string ss = s;
+			if (toEnd)
+			{
+				string dt = System.DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+				ss = "[" + dt + "]: " + s;
+			}
 			StreamWriter writer = new StreamWriter(file, toEnd);
-			writer.WriteLine(s);
+			writer.WriteLine(ss);
 			writer.Close();
 		}
 		// without \n
 		public void logg(string s, bool toEnd)
 		{
+			string ss = s;
+			if (toEnd)
+			{
+				string dt= System.DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+				ss = "[" + dt + "]: " + s;
+			}
 			StreamWriter writer = new StreamWriter(file, toEnd);
-			writer.Write(s);
+			writer.Write(ss);
 			writer.Close();
 		}
 

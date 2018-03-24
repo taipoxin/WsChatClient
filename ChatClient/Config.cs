@@ -14,5 +14,6 @@ namespace ChatClient
 
 		public static string httpSource = "localhost:3000";
 		public static string userName = "";
+		public static string logFileName = "logs.txt";
 	}
 }

@@ -6,14 +6,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using WebSocketSharp;
 
 namespace ChatClient
 {
 	public class WsController
 	{
+		// core low level ws client
 		private WebSocket ws;
-		private FileLogger l = new FileLogger("ws.txt");
+		private FileLogger l = new FileLogger(Config.logFileName);
+
+		// links for view classes
 
 		private Signin signinWindow;
 		private Signup signupWindow;
@@ -35,15 +39,14 @@ namespace ChatClient
 		}
 
 
-
+		/// <summary>
+		/// initialise webSocket in another thread
+		/// </summary>
 		public WsController()
 		{
 			Thread t = new Thread(new ThreadStart(initWs));
 			t.IsBackground = true;
 			t.Start();
-			//ws = initWebSocket();
-			// init file
-			l.logg("", false);
 		}
 
 		public WebSocket getWs()
@@ -56,12 +59,17 @@ namespace ChatClient
 			ws = initWebSocket();
 		}
 		
+		/// <summary>
+		/// initialise webSocket client with all configured listeners
+		/// </summary>
+		/// <returns>ws object</returns>
 		private WebSocket initWebSocket()
 		{
 			WebSocket ws = new WebSocket(Config.wsSource);
 
 
-			ws.OnMessage += (sender, e) => {
+			ws.OnMessage += (sender, e) =>
+			{
 
 
 				var resp = JsonConvert.DeserializeObject<dynamic>(e.Data);
@@ -83,7 +91,7 @@ namespace ChatClient
 						l.log("bad data for user");
 					}
 				}
-				
+
 				// пришло новое сообщение - отображаем в списке сообщений
 				else if ("message".Equals(type))
 				{
@@ -115,6 +123,38 @@ namespace ChatClient
 						l.log("user already exists");
 					}
 				}
+				// рендерит в MainWindow список каналов
+				else if ("get_channel".Equals(type))
+				{
+					JArray array = resp.channels;
+					List<dynamic> ll = array.ToObject<List<dynamic>>();
+					l.log("received channels:  " + ll.ToArray().ToString());
+					mainWindow.dispatchShowChannels(ll);
+				}
+
+				else if ("new_channel".Equals(type))
+				{
+					bool success = resp.success;
+					string n = resp.name;
+					if (success)
+					{
+						l.log("nice channel creation: " + n);
+						NewChannelResponse m = dynamicToNewChannelResponse(resp);
+						mainWindow.dispatchCreateChannel(m);
+					}
+					else
+					{ 
+						l.log("bad channel creation: " + n);
+					}
+				}
+				else if ("get_channel_messages".Equals(type))
+				{
+					JArray array = resp.messages;
+					List<dynamic> ll = array.ToObject<List<dynamic>>();
+					string ch = resp.channel;
+					l.log("received messages for channel " + ch + " are " + array.ToString());
+					mainWindow.dispatchShowChannelMessages(ch, ll);
+				}
 
 			};
 			// establish again
@@ -144,15 +184,62 @@ namespace ChatClient
 			string type = obj.type;
 			long   time = obj.time;
 			string message = obj.message;
-			return new MessageResponse(type, message, from, time);
+			string channel = obj.channel;
+			return new MessageResponse(type, message, from, time, channel);
 		}
-		
+
+		private NewChannelResponse  dynamicToNewChannelResponse(dynamic obj)
+		{
+			var ch = new NewChannelResponse();
+			ch.name = obj.name;
+			ch.fullname = obj.fullname;
+			ch.admin = obj.admin;
+			ch.success = obj.success;
+			ch.type = obj.type;
+			return ch;
+		}
+
 	}
 
 	// only for checking response type
 	public class CommonResponse
 	{
 		public string type;
+	}
+
+
+	public class NewChannelRequest
+	{
+		public string name;
+		public string fullname;
+		public string admin;
+		public string type;
+	}
+
+	public class NewChannelResponse
+	{
+		public string name;
+		public string fullname;
+		public string admin;
+		public string type;
+		public bool success;
+	}
+
+	public class GetChannelMessagesReq
+	{
+		public string from;
+		public string channel;
+		// "get_channel_messages"
+		public string type;
+	}
+
+
+	public class ChannelRequest
+	{
+		public string type;
+		// if name == '*' return all channels
+		public string name;
+		public string from;
 	}
 
 	public class RegRequest
@@ -187,18 +274,21 @@ namespace ChatClient
 	{
 		public MessageResponse() {}
 
-		public MessageResponse(string type, string message, string @from, long time)
+		public MessageResponse(string type, string message, string @from, long time, string channel)
 		{
 			this.type = type;
 			this.message = message;
 			this.@from = @from;
 			this.time = time;
+			this.channel = channel;
 		}
 
-		public string type;
-		public string message;
 		public string from;
+		public string message;
+		public string channel;
 		// ms from 1970
 		public long time;
+		public string type;
+
 	}
 }
