@@ -93,7 +93,7 @@ namespace ChatClient
 
 		public void openMainWindow()
 		{
-			TestWindow w = new TestWindow();
+			MainWindow w = new MainWindow();
 			w.setWsController(wsController);
 			w.Show();
 

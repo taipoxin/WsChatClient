@@ -21,7 +21,7 @@ namespace ChatClient
 
 		private Signin signinWindow;
 		private Signup signupWindow;
-		private TestWindow mainWindow;
+		private MainWindow mainWindow;
 
 		public void setSigninWindow(Signin w)
 		{
@@ -33,7 +33,7 @@ namespace ChatClient
 			signupWindow = w;
 		}
 
-		public void setMainWindow(TestWindow w)
+		public void setMainWindow(MainWindow w)
 		{
 			mainWindow = w;
 		}
