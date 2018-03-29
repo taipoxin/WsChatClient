@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using LiteDB;
 using Newtonsoft.Json;
 using WebSocketSharp;
 
@@ -203,7 +204,9 @@ namespace ChatClient
 						string name = ((TextBlock)ch.Children[3]).Text;
 
 						string time = getCurrentTime();
+						// show
 						MessageList.Items.Add(createMyMessageGrid(MessageTextBox.Text, time));
+						// send
 						MessageResponse mes = new MessageResponse("message", MessageTextBox.Text, Config.userName, DateTimeOffset.Now.ToUnixTimeMilliseconds(), name);
 						string jsonReq = JsonConvert.SerializeObject(mes);
 						l.log("sending message");
@@ -211,6 +214,14 @@ namespace ChatClient
 
 						MessageTextBox.Text = "";
 						ScrollMessageListToEnd();
+
+						// serialise
+						using (var db = new LiteDatabase(@"LocalData.db"))
+						{
+							var messages = db.GetCollection<MessageEntity>(mes.channel + "_mes");
+							var ent = new MessageEntity {from = mes.@from, message = mes.message, time = mes.time};
+							messages.Insert(ent);
+						}
 					}
 				}
 			}
@@ -308,7 +319,6 @@ namespace ChatClient
 				MessageList.Items.Add(mGrid);
 				ScrollMessageListToEnd();
 			}
-			// TODO: сериализация сообщений
 		}
 
 
@@ -331,15 +341,13 @@ namespace ChatClient
 			string name = ((TextBlock)ch.Children[3]).Text;
 			if (channelName == name)
 			{
-				MessageList.Items.Clear();
+				//MessageList.Items.Clear();
 				// рендерим список сообщений
 				foreach (dynamic m in messages)
 				{
 					string mes = m.message;
 					string fr = m.from;
-					string channel = m.channel;
 					long time = m.time;
-					string type = m.type;
 					// TODO: сериализовывать сообщения
 					Grid mGrid;
 					if (fr.Equals(Config.userName))
@@ -354,8 +362,6 @@ namespace ChatClient
 					ScrollMessageListToEnd();
 				}
 			}
-			// TODO: сериализация
-			// если нет, то сохраняем в стеш (пока что дропаем)
 		}
 
 
@@ -475,6 +481,71 @@ namespace ChatClient
 			}
 		}
 
+		public void showChannelInnerMessages(string channelName, List<MessageEntity> messages)
+		{
+			// смотрим, какой канал сейчас выбран
+			Grid ch = (Grid)ChannelList.SelectedItems[0];
+			string name = ((TextBlock)ch.Children[3]).Text;
+			if (channelName == name)
+			{
+				// рендерим список сообщений
+				foreach (MessageEntity m in messages)
+				{
+					string mes = m.message;
+					string fr = m.from;
+					long time = m.time;
+					Grid mGrid;
+					if (fr.Equals(Config.userName))
+					{
+						mGrid = createMyMessageGrid(mes, longToDateTime(time));
+					}
+					else
+					{
+						mGrid = createAnotherMessageGrid(fr, mes, longToDateTime(time));
+					}
+					MessageList.Items.Add(mGrid);
+					ScrollMessageListToEnd();
+				}
+			}
+		}
+
+		private void findAndRequireMessages(string channelName)
+		{
+			// resp: {message, from, channel, time, type: 'message'}
+			// храним: {message, from, time}
+			using (var db = new LiteDatabase(@"LocalData.db"))
+			{
+				var messages = db.GetCollection<MessageEntity>(channelName + "_mes");
+
+				var mes = messages.FindAll();
+				
+				// отправляем запрос на все
+				if (mes.Count() == 0)
+				{
+					var ws = wsController.getWs();
+					if (ws != null)
+					{
+						var getChannelMessages = new GetChannelMessagesReq();
+						getChannelMessages.type = "get_channel_messages";
+						getChannelMessages.channel = channelName;
+						getChannelMessages.from = Config.userName;
+						string getChM = JsonConvert.SerializeObject(getChannelMessages);
+						ws.Send(getChM);
+					}
+				}
+				// запрашиваем с сервера только новые сообщения (время больше чем максимальное)
+				// и сразу их сериализуем
+				else
+				{
+					var t = mes.Last().time;
+					// TODO: прикрутить запрос сообщений с фильтром по time > t
+					// запрашиваем с сервера сообщения где time > t
+					// отображаем наши сообщения
+					showChannelInnerMessages(channelName, mes.ToList());
+					// все пришедшие с сервера сообщения записываем в конец
+				}
+			}
+		}
 
 		/// <summary>
 		/// changed selection
@@ -491,16 +562,11 @@ namespace ChatClient
 			// загружаем историю сообщений для данного канала
 			// отправляем запрос на получение истории данного канала
 			string chName = ((TextBlock)channel.Children[3]).Text;
-			var ws = wsController.getWs();
-			if (ws != null)
-			{
-				var getChannelMessages = new GetChannelMessagesReq();
-				getChannelMessages.type = "get_channel_messages";
-				getChannelMessages.channel = chName;
-				getChannelMessages.from = Config.userName;
-				string getChM = JsonConvert.SerializeObject(getChannelMessages);
-				ws.Send(getChM);
-			}
+			MessageList.Items.Clear();
+			findAndRequireMessages(chName);
+			
+
+
 		}
 
 	}

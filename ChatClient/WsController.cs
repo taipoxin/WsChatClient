@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using LiteDB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WebSocketSharp;
@@ -102,7 +104,18 @@ namespace ChatClient
 						l.log("another sleep");
 						Thread.Sleep(100);
 					}
+					// show
 					mainWindow.dispatchShowMessage(m);
+
+					// serialise
+					string channelName = m.channel;
+					var ent = new MessageEntity { from = m.@from, message = m.message, time = m.time};
+					using (var db = new LiteDatabase(@"LocalData.db"))
+					{
+						var messagesCollection = db.GetCollection<MessageEntity>(channelName + "_mes");
+						messagesCollection.Insert(ent);
+					}
+
 				}
 
 				else if ("register".Equals(type))
@@ -152,8 +165,18 @@ namespace ChatClient
 					JArray array = resp.messages;
 					List<dynamic> ll = array.ToObject<List<dynamic>>();
 					string ch = resp.channel;
+
 					l.log("received messages for channel " + ch + " are " + array.ToString());
+					// show
 					mainWindow.dispatchShowChannelMessages(ch, ll);
+					
+					// serialise
+					var entities = listDynamicToMessageEntities(ll);
+					using (var db = new LiteDatabase(@"LocalData.db"))
+					{
+						var messagesCollection = db.GetCollection<MessageEntity>(ch + "_mes");
+						messagesCollection.Insert(entities);
+					}
 				}
 
 			};
@@ -166,6 +189,20 @@ namespace ChatClient
 
 			tryToConnect(ws);
 			return ws;
+		}
+
+		private List<MessageEntity> listDynamicToMessageEntities(List<dynamic> ll)
+		{
+			List<MessageEntity> entities = new List<MessageEntity>(ll.Capacity);
+			foreach (dynamic m in ll)
+			{
+				string fr = m.from;
+				string mes = m.message;
+				long t = m.time;
+				var mess = new MessageEntity { from = fr, message = mes, time = t };
+				entities.Add(mess);
+			}
+			return entities;
 		}
 
 		private void tryToConnect(WebSocket ws)
@@ -200,6 +237,15 @@ namespace ChatClient
 		}
 
 	}
+
+	public class MessageEntity
+	{
+		public Guid Id { get; set; }
+		public string from { get; set; }
+		public string message { get; set; }
+		public long time { get; set; }
+	}
+
 
 	// only for checking response type
 	public class CommonResponse
