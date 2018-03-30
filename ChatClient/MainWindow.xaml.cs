@@ -367,11 +367,12 @@ namespace ChatClient
 
 		private void EllipseMessage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
+			/*
 			// TODO: пофиксить, тестовая сериализация
 			MessageBean[] beans = MessageListGridsToObjectArray();
 			string beansJ = WriteFromArrayOfObjectsToJson(beans);
 			File.WriteAllText("MessageList.json", beansJ);
-
+			*/
 		}
 
 		// if ChannelGrid state is Collapsed
@@ -518,7 +519,8 @@ namespace ChatClient
 				var messages = db.GetCollection<MessageEntity>(channelName + "_mes");
 
 				var mes = messages.FindAll();
-				
+				mes = mes.OrderBy(x => x.time);
+
 				// отправляем запрос на все
 				if (mes.Count() == 0)
 				{
@@ -543,6 +545,17 @@ namespace ChatClient
 					// отображаем наши сообщения
 					showChannelInnerMessages(channelName, mes.ToList());
 					// все пришедшие с сервера сообщения записываем в конец
+					var ws = wsController.getWs();
+					if (ws != null)
+					{
+						var getChannelMessages = new GetChannelMessagesReq();
+						getChannelMessages.type = "get_channel_messages";
+						getChannelMessages.channel = channelName;
+						getChannelMessages.from = Config.userName;
+						getChannelMessages.time = t;
+						string getChM = JsonConvert.SerializeObject(getChannelMessages);
+						ws.Send(getChM);
+					}
 				}
 			}
 		}

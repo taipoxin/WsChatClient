@@ -175,6 +175,7 @@ namespace ChatClient
 					using (var db = new LiteDatabase(@"LocalData.db"))
 					{
 						var messagesCollection = db.GetCollection<MessageEntity>(ch + "_mes");
+						messagesCollection.EnsureIndex(x => x.time);
 						messagesCollection.Insert(entities);
 					}
 				}
@@ -275,8 +276,10 @@ namespace ChatClient
 	{
 		public string from;
 		public string channel;
+		public long time;
 		// "get_channel_messages"
 		public string type;
+
 	}
 
 
