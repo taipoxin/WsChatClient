@@ -24,83 +24,100 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
     </Window.Resources>
-    <Grid SizeChanged="Grid_SizeChanged">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-       
-        <!-- шаблоны элементов -->
-        <!-- Visible должна быть Collapsed -->
-        <Grid Name="ChannelSampleGrid" HorizontalAlignment="Stretch" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
-            <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
-            <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
-            <!-- сохраняет чисто как свойство -->
-            <TextBlock Visibility="Collapsed" Text="name"/>
-        </Grid>
-        <!-- сообщение -->
-        <Grid  Name="AnotherMessageGrid" HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="32"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid SizeChanged="Grid_SizeChanged" Visibility="Visible">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
-        </Grid>
-        <!-- сообщение -->
-        <Grid Name="MyMessageGrid" HorizontalAlignment="Right" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="32"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-            <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
-        </Grid>
-        <!-- конец шаблонов -->
-        
-        
-        <Grid Name="ChannelGrid" Grid.Column="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Visibility="Visible">
-            <!-- список каналов -->
-            <ListBox Name="ChannelList" HorizontalAlignment="Stretch" Width="374" 
-                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="#FF52557C" SelectionChanged="ChannelList_SelectionChanged">
-                <!-- каналы -->
-                
-            </ListBox>
-            <Ellipse Fill="#FF2BF051" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="EllipseChannels_MouseLeftButtonDown"/>
-        </Grid>
-        <!-- область чата -->
-        <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FF7B9FD1">
-            <!-- кнопка сворачивания списка каналов -->
-            <Rectangle Width="55" Height="55" VerticalAlignment="Top" HorizontalAlignment="Left" Fill="#FF455BFF" Stroke="#FF8C85FF" MouseLeftButtonDown="BackRect_MouseLeftButtonDown"/>
-                
-            <!-- шапка канала -->
-            <Grid Name="ChatHeader"  Background="#FF253F96" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55" Margin="55,0,0,0">
-                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ChannelName" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
-                <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="количество участников" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14"/>
-            </Grid>
-            <!-- список сообщений -->
-            <ListBox Name="MessageList" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="{x:Null}" Margin="0,55,0,55"
-                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
-                <!-- сообщения -->
 
-            </ListBox>
-            <!-- поля для ввода текста -->
-            <Grid Background="#FF253F96" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Height="55">
-                <TextBox Name="MessageTextBox" Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC" KeyDown="TextBox_KeyDown"/>
-                <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="EllipseMessage_MouseLeftButtonDown"/>
+            <!-- шаблоны элементов -->
+            <!-- Visible должна быть Collapsed -->
+            <Grid Name="ChannelSampleGrid" HorizontalAlignment="Stretch" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
+                <!-- сохраняет чисто как свойство -->
+                <TextBlock Visibility="Collapsed" Text="name"/>
+            </Grid>
+            <!-- сообщение -->
+            <Grid  Name="AnotherMessageGrid" HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="32"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some message" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
+            </Grid>
+            <!-- сообщение -->
+            <Grid Name="MyMessageGrid" HorizontalAlignment="Right" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="32"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="10,10,10,0" TextWrapping="Wrap" Text="Me" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
+                <TextBlock Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2"  HorizontalAlignment="Stretch" Margin="10,0,10,10" TextWrapping="Wrap" Text="some" VerticalAlignment="Top"  MaxWidth="400" FontFamily="Tahoma" FontSize="14"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="18.03 20:00" VerticalAlignment="Top"  MaxWidth="400" FontSize="14" FontFamily="Tahoma"/>
+            </Grid>
+            <!-- конец шаблонов -->
+
+
+            <Grid Name="ChannelGrid" Grid.Column="0" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Visibility="Visible">
+                <!-- список каналов -->
+                <ListBox Name="ChannelList" HorizontalAlignment="Stretch" Width="374" 
+                         ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="#FF52557C" SelectionChanged="ChannelList_SelectionChanged">
+                    <!-- каналы -->
+
+                </ListBox>
+                <Ellipse Fill="#FF2BF051" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="EllipseChannels_MouseLeftButtonDown"/>
+            </Grid>
+            <!-- область чата -->
+            <Grid Grid.Column="1" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Margin="0,0,0,0" Background="#FF7B9FD1">
+                <!-- кнопка сворачивания списка каналов -->
+                <Rectangle Width="55" Height="55" VerticalAlignment="Top" HorizontalAlignment="Left" Fill="#FF455BFF" Stroke="#FF8C85FF" MouseLeftButtonDown="BackRect_MouseLeftButtonDown"/>
+
+                <!-- шапка канала -->
+                <Grid Name="ChatHeader"  Background="#FF253F96" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55" Margin="55,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ChannelName" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="количество участников" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14" Foreground="White"/>
+                    <Ellipse Fill="#FFE1EA17" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" RenderTransformOrigin="0.514,0.5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" Visibility="Hidden"/>
+                </Grid>
+                <!-- список сообщений -->
+                <ListBox Name="MessageList" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="{x:Null}" Margin="0,55,0,55"
+                         ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+                    <!-- сообщения -->
+
+                </ListBox>
+                <!-- поля для ввода текста -->
+                <Grid Background="#FF253F96" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Height="55">
+                    <TextBox Name="MessageTextBox" Template="{StaticResource TextBoxTemplate}" HorizontalAlignment="Stretch" Height="43" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom" Margin="10,0,60,5" FontSize="14" FontFamily="Tahoma"  Background="#FFE0CCCC" KeyDown="TextBox_KeyDown"/>
+                    <Ellipse Fill="#FF4EC9FF" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" MouseLeftButtonDown="EllipseMessage_MouseLeftButtonDown"/>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Name="CreateChannelParentGrid" Visibility="Hidden">
+            <Grid Background="Black" Opacity="0.4"></Grid>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="266" Background="#FFF6F6F6">
+                <Label Content="Создать канал" HorizontalAlignment="Center"  VerticalAlignment="Top" FontSize="22" Margin="27,15,64,0" Width="175"/>
+                <Label Content="Идентификатор канала" HorizontalAlignment="Left" Margin="25,60,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+                <TextBox Name="ChannelIDBox" HorizontalAlignment="Left" Height="23" Margin="25,90,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
+                <Label Content="Название канала" HorizontalAlignment="Left" Margin="25,118,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
+                <TextBox Name="ChannelNameBox" HorizontalAlignment="Left" Height="23" Width="220" Margin="25,149,0,0" VerticalAlignment="Top"/>
+                <Button Content="Create" HorizontalAlignment="Right" Margin="0,0,21,10" VerticalAlignment="Bottom" Width="100" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White" Click="Button_Click" Height="19"/>
+                <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C" Height="19" Margin="25,0,0,10" Click="Button_Click_1"/>
+                <Label Name="CrChBadData" Content="Неверные данные" HorizontalAlignment="Left" Margin="27,194,0,0" VerticalAlignment="Top" Foreground="#FFEE2323" Width="149" Visibility="Hidden"/>
+
             </Grid>
         </Grid>
     </Grid>

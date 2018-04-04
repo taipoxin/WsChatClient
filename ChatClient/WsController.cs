@@ -147,18 +147,8 @@ namespace ChatClient
 
 				else if ("new_channel".Equals(type))
 				{
-					bool success = resp.success;
-					string n = resp.name;
-					if (success)
-					{
-						l.log("nice channel creation: " + n);
-						NewChannelResponse m = dynamicToNewChannelResponse(resp);
-						mainWindow.dispatchCreateChannel(m);
-					}
-					else
-					{ 
-						l.log("bad channel creation: " + n);
-					}
+					NewChannelResponse m = dynamicToNewChannelResponse(resp);
+					mainWindow.dispatchCreateChannel(m);
 				}
 				else if ("get_channel_messages".Equals(type))
 				{

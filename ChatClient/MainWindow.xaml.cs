@@ -69,7 +69,10 @@ namespace ChatClient
 		private string currentChannel;
 		// using when send user's messages
 		private string userIdentification = "Me";
-		
+		// used for counting created channels
+		private int indx = 1;
+
+
 		private WsController wsController;
 		private FileLogger l = new FileLogger(Config.logFileName);
 
@@ -95,34 +98,7 @@ namespace ChatClient
 			return g1;
 		}
 
-		// used for counting created channels
-		private int indx = 1;
-
-		/// <summary>
-		/// press the button create new channel:
-		/// it send request for creation a channel, 
-		/// and if response.success == true, it show the channel
-		/// <see cref="createChannel"/>
-		/// </summary>
-		private void EllipseChannels_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			// создаем новый канал
-			string name = "sampleCh" + indx;
-			string fullname = "канал " + indx;
-
-			// отправляем запрос о создании канала
-			var ws = wsController.getWs();
-			if (ws != null)
-			{
-				NewChannelRequest r = new NewChannelRequest();
-				r.type = "new_channel";
-				r.name = name;
-				r.fullname = fullname;
-				r.admin = Config.userName;
-				ws.Send(JsonConvert.SerializeObject(r));
-			}
-			indx++;
-		}
+		
 
 
 		/// <summary>
@@ -187,6 +163,41 @@ namespace ChatClient
 			MessageList.ScrollIntoView(MessageList.Items[MessageList.Items.Count - 1]);
 		}
 
+
+		private void readFromTextBoxAndSend()
+		{
+			if (MessageTextBox.Text != "")
+			{
+				var ws = wsController.getWs();
+				if (ws != null)
+				{
+					// берем имя выбранного канала
+					Grid ch = (Grid)ChannelList.SelectedItems[0];
+					string name = ((TextBlock)ch.Children[3]).Text;
+
+					string time = getCurrentTime();
+					// show
+					MessageList.Items.Add(createMyMessageGrid(MessageTextBox.Text, time));
+					// send
+					MessageResponse mes = new MessageResponse("message", MessageTextBox.Text, Config.userName, DateTimeOffset.Now.ToUnixTimeMilliseconds(), name);
+					string jsonReq = JsonConvert.SerializeObject(mes);
+					l.log("sending message");
+					ws.Send(jsonReq);
+
+					MessageTextBox.Text = "";
+					ScrollMessageListToEnd();
+
+					// serialise
+					using (var db = new LiteDatabase(@"LocalData.db"))
+					{
+						var messages = db.GetCollection<MessageEntity>(mes.channel + "_mes");
+						var ent = new MessageEntity { from = mes.@from, message = mes.message, time = mes.time };
+						messages.Insert(ent);
+					}
+				}
+			}
+		}
+
 		/// <summary>
 		/// on 'Enter' key method sends message
 		/// </summary>
@@ -194,37 +205,13 @@ namespace ChatClient
 		{
 			if (e.Key == Key.Return)
 			{
-				if (MessageTextBox.Text != "")
-				{
-					var ws = wsController.getWs();
-					if (ws != null)
-					{
-						// берем имя выбранного канала
-						Grid ch = (Grid)ChannelList.SelectedItems[0];
-						string name = ((TextBlock)ch.Children[3]).Text;
-
-						string time = getCurrentTime();
-						// show
-						MessageList.Items.Add(createMyMessageGrid(MessageTextBox.Text, time));
-						// send
-						MessageResponse mes = new MessageResponse("message", MessageTextBox.Text, Config.userName, DateTimeOffset.Now.ToUnixTimeMilliseconds(), name);
-						string jsonReq = JsonConvert.SerializeObject(mes);
-						l.log("sending message");
-						ws.Send(jsonReq);
-
-						MessageTextBox.Text = "";
-						ScrollMessageListToEnd();
-
-						// serialise
-						using (var db = new LiteDatabase(@"LocalData.db"))
-						{
-							var messages = db.GetCollection<MessageEntity>(mes.channel + "_mes");
-							var ent = new MessageEntity {from = mes.@from, message = mes.message, time = mes.time};
-							messages.Insert(ent);
-						}
-					}
-				}
+				readFromTextBoxAndSend();
 			}
+		}
+
+		private void EllipseMessage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			readFromTextBoxAndSend();
 		}
 
 		// serialisation methods
@@ -265,7 +252,28 @@ namespace ChatClient
 		/// </summary>
 		private void createChannel(NewChannelResponse m)
 		{
-			ChannelList.Items.Add(createChannelGrid(m.fullname, 2 + indx, 5 + indx, m.name));
+			if (m.success)
+			{
+				l.log("nice channel creation: " + m.name);
+
+				// очищаем поля (после успешного создания канала)
+				ChannelIDBox.Text = "";
+				ChannelNameBox.Text = "";
+				CrChBadData.Visibility = Visibility.Hidden;
+				CreateChannelParentGrid.Visibility = Visibility.Hidden;
+
+				// отображаем новый канал
+				ChannelList.Items.Add(createChannelGrid(m.fullname, 0, 1, m.name));
+			}
+			else
+			{
+				l.log("server response: bad channel creation: " + m.name);
+				CrChBadData.Content = "Ответ сервера: неверные данные";
+				CrChBadData.Visibility = Visibility.Visible;
+				CreateChannelParentGrid.Visibility = Visibility.Visible;
+			}
+			// возвращаем управление
+			sending = false;
 		}
 
 
@@ -348,7 +356,6 @@ namespace ChatClient
 					string mes = m.message;
 					string fr = m.from;
 					long time = m.time;
-					// TODO: сериализовывать сообщения
 					Grid mGrid;
 					if (fr.Equals(Config.userName))
 					{
@@ -365,15 +372,7 @@ namespace ChatClient
 		}
 
 
-		private void EllipseMessage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			/*
-			// TODO: пофиксить, тестовая сериализация
-			MessageBean[] beans = MessageListGridsToObjectArray();
-			string beansJ = WriteFromArrayOfObjectsToJson(beans);
-			File.WriteAllText("MessageList.json", beansJ);
-			*/
-		}
+		
 
 		// if ChannelGrid state is Collapsed
 		private bool isCollapsed = false;
@@ -540,7 +539,6 @@ namespace ChatClient
 				else
 				{
 					var t = mes.Last().time;
-					// TODO: прикрутить запрос сообщений с фильтром по time > t
 					// запрашиваем с сервера сообщения где time > t
 					// отображаем наши сообщения
 					showChannelInnerMessages(channelName, mes.ToList());
@@ -582,5 +580,85 @@ namespace ChatClient
 
 		}
 
+
+		/// <summary>
+		/// press the button create new channel:
+		/// it send request for creation a channel, 
+		/// and if response.success == true, it show the channel
+		/// <see cref="createChannel"/>
+		/// </summary>
+		private void EllipseChannels_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (CreateChannelParentGrid.Visibility != Visibility.Hidden)
+			{
+				l.log("something wrong with visibility of createChannelForm: setting visibility to hidden");
+				CreateChannelParentGrid.Visibility = Visibility.Hidden;
+				return;
+			}
+			CreateChannelParentGrid.Visibility = Visibility.Visible;
+
+		}
+
+		// контроль отправки на сервер
+		private bool sending = false;
+		// время отправки запроса на сервер
+		private long sendTime;
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+			if (sending)
+			{
+				// delay 5 sec
+				var delay = (new DateTime().Ticks * 10000) - sendTime;
+				if (delay > 5000)
+				{
+					l.log("сервер недоступен: timeout create_channel, delay:  " + delay);
+					CrChBadData.Content = "Сервер временно недоступен (timeout)";
+					CrChBadData.Visibility = Visibility.Visible;
+				}
+				return;
+			}
+			string name = ChannelIDBox.Text;
+			string fullname = ChannelNameBox.Text;
+			if (name == fullname || name == "" || fullname == "")
+			{
+				l.log("bad channel data");
+				CrChBadData.Content = "Неверные данные";
+				CrChBadData.Visibility = Visibility.Visible;
+				return;
+			}
+
+			// отправляем запрос о создании канала
+			var ws = wsController.getWs();
+			if (ws != null)
+			{
+				NewChannelRequest r = new NewChannelRequest();
+				r.type = "new_channel";
+				r.name = name;
+				r.fullname = fullname;
+				r.admin = Config.userName;
+				ws.Send(JsonConvert.SerializeObject(r));
+				sending = true;
+				sendTime = new DateTime().Ticks * 10000;
+			}
+			else
+			{
+				l.log("сервер недоступен: create_channel");
+				CrChBadData.Content = "Сервер временно недоступен";
+				CrChBadData.Visibility = Visibility.Visible;
+			}
+			
+		}
+
+		private void Button_Click_1(object sender, RoutedEventArgs e)
+		{
+			CreateChannelParentGrid.Visibility = Visibility.Hidden;
+			sending = false;
+		}
+
+		// запрос на получение онлайн пользователей
+		private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			// TODO: {sender, type : get_online_users }
+		}
 	}
 }
