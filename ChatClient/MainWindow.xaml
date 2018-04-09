@@ -33,7 +33,7 @@
 
             <!-- шаблоны элементов -->
             <!-- Visible должна быть Collapsed -->
-            <Grid Name="ChannelSampleGrid" HorizontalAlignment="Stretch" Height="80" Background="#FFFFE8E8" Visibility="Collapsed">
+            <Grid Name="ChannelSampleGrid" HorizontalAlignment="Stretch" Height="80" Background="#FFFFE8E8" Visibility="Collapsed" MouseRightButtonDown="ChannelSampleGrid_MouseRightButtonDown" >
                 <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Канал для успешных людей" VerticalAlignment="Top" Height="32" Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold"/>
                 <TextBlock HorizontalAlignment="Left" Margin="322,10,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Height="32" Width="42" FontSize="20" TextAlignment="Center" FontFamily="Tahoma"/>
                 <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
@@ -90,7 +90,7 @@
                 <Grid Name="ChatHeader"  Background="#FF253F96" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55" Margin="55,0,0,0">
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ChannelName" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold" Foreground="White"/>
                     <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="количество участников" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14" Foreground="White"/>
-                    <Ellipse Fill="#FFE1EA17" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" RenderTransformOrigin="0.514,0.5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" Visibility="Hidden"/>
+                    <Ellipse Fill="#FFE1EA17" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" RenderTransformOrigin="0.514,0.5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" Visibility="Visible"/>
                 </Grid>
                 <!-- список сообщений -->
                 <ListBox Name="MessageList" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="{x:Null}" Margin="0,55,0,55"
@@ -114,9 +114,22 @@
                 <TextBox Name="ChannelIDBox" HorizontalAlignment="Left" Height="23" Margin="25,90,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="220"/>
                 <Label Content="Название канала" HorizontalAlignment="Left" Margin="25,118,0,0" VerticalAlignment="Top" Foreground="#FF7F7C7C"/>
                 <TextBox Name="ChannelNameBox" HorizontalAlignment="Left" Height="23" Width="220" Margin="25,149,0,0" VerticalAlignment="Top"/>
-                <Button Content="Create" HorizontalAlignment="Right" Margin="0,0,21,10" VerticalAlignment="Bottom" Width="100" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White" Click="Button_Click" Height="19"/>
-                <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C" Height="19" Margin="25,0,0,10" Click="Button_Click_1"/>
+                <Button Content="Create" HorizontalAlignment="Right" Margin="0,0,21,10" VerticalAlignment="Bottom" Width="100" Background="#FF2E76EE" BorderBrush="#FF2E76EE" Foreground="White" Click="CreateChannelButtonClick" Height="19"/>
+                <Button Content="Cancel" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C" Height="19" Margin="25,0,0,10" Click="CreateChannelExitClick"/>
                 <Label Name="CrChBadData" Content="Неверные данные" HorizontalAlignment="Left" Margin="27,194,0,0" VerticalAlignment="Top" Foreground="#FFEE2323" Width="149" Visibility="Hidden"/>
+
+            </Grid>
+        </Grid>
+
+        <Grid Name="GetOnlineUsersGrid" Visibility="Hidden">
+            <Grid Background="Black" Opacity="0.4"></Grid>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="500" Height="400" Background="#FFF6F6F6">
+                <ListBox Name="OnlineUsersList" HorizontalAlignment="Center" Height="324"  VerticalAlignment="Center" Width="399" 
+                    ScrollViewer.VerticalScrollBarVisibility="Hidden" SelectionChanged="OnlineUsersList_OnSelectionChanged"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                </ListBox>
+                <Button Content="Выход" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C" Height="19" Margin="51,0,0,10" Click="OnlineUserExitClick"/>
+                <Label Name="AddingUserResponseLabel" Content="" HorizontalAlignment="Left" Margin="173,368,0,0" VerticalAlignment="Top" Foreground="#FF5AF133" Width="149" Visibility="Hidden"/>
 
             </Grid>
         </Grid>

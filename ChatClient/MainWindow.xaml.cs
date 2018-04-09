@@ -95,6 +95,7 @@ namespace ChatClient
 			((TextBlock)ch[1]).Text = "" + newM;
 			((TextBlock)ch[2]).Text = users + " участников";
 			((TextBlock)ch[3]).Text = name;
+			g1.MouseRightButtonDown += ChannelSampleGrid_MouseRightButtonDown;
 			return g1;
 		}
 
@@ -277,24 +278,25 @@ namespace ChatClient
 		}
 
 
-		public void dispatchShowChannels(List<dynamic> channels)
+		public void dispatchShowChannels(List<dynamic> channels, List<Int32> counts)
 		{
 			Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				showChannels(channels);
+				showChannels(channels, counts);
 			}));
 		}
 		
 		/// <summary>
 		/// add channels from server to ChannelList
 		/// </summary>
-		private void showChannels(List<dynamic> channels)
+		private void showChannels(List<dynamic> channels, List<Int32> counts)
 		{
-
-			foreach (dynamic ch in channels)
+			for (int i = 0; i < channels.Count; i++)
 			{
+				dynamic ch = channels[i];
+				int user_count = counts[i];
 				string n = ch.name;
 				string fn = ch.fullname;
-				Grid g = createChannelGrid(fn, 0, 0, n);
+				Grid g = createChannelGrid(fn, 0, user_count, n);
 				ChannelList.Items.Add(g);
 			}
 		}
@@ -441,45 +443,18 @@ namespace ChatClient
 			chatCountBlock.Text = countBlockFrom.Text;
 		}
 
-		/// <summary>
-		/// method change at least one parameter, or throw exception
-		/// </summary>
-		/// <param name="targetChannel">cannot be null, throw exception</param>
-		/// <param name="channelName"></param>
-		/// <param name="channelNew"></param>
-		/// <param name="channelCount"></param>
-		private void changeChannelParams(Grid targetChannel, string channelName, string channelNew, string channelCount)
+		private Grid getChannelGridByName(string channelName)
 		{
-			int i = 0;
-			if (targetChannel != null)
+			foreach (Grid chGrid in ChannelList.Items)
 			{
-				var ch = targetChannel.Children;
-				if (channelName != null)
+				if (((TextBlock) chGrid.Children[3]).Text == channelName)
 				{
-					((TextBlock) ch[0]).Text = channelName;
-					i++;
-				}
-				if (channelNew!= null)
-				{
-					((TextBlock)ch[1]).Text = channelNew;
-					i++;
-				}
-				if (channelCount != null)
-				{
-					((TextBlock)ch[2]).Text = channelCount;
-					i++;
-				}
-
-				if (i == 0)
-				{
-					throw new  Exception("all grid's params are null");
+					return chGrid;
 				}
 			}
-			else
-			{
-				throw new Exception("target cannot be null");
-			}
+			return null;
 		}
+
 
 		public void showChannelInnerMessages(string channelName, List<MessageEntity> messages)
 		{
@@ -603,7 +578,7 @@ namespace ChatClient
 		private bool sending = false;
 		// время отправки запроса на сервер
 		private long sendTime;
-		private void Button_Click(object sender, RoutedEventArgs e)
+		private void CreateChannelButtonClick(object sender, RoutedEventArgs e)
 		{
 			if (sending)
 			{
@@ -649,16 +624,208 @@ namespace ChatClient
 			
 		}
 
-		private void Button_Click_1(object sender, RoutedEventArgs e)
+		private void CreateChannelExitClick(object sender, RoutedEventArgs e)
 		{
 			CreateChannelParentGrid.Visibility = Visibility.Hidden;
 			sending = false;
 		}
 
+		public void dispatchGetOnlineUsers(GetOnlineUsers obj)
+		{
+			Dispatcher.BeginInvoke(new ThreadStart(delegate {
+				getOnlineUsers(obj);
+			}));
+		}
+
+		public void getOnlineUsers(GetOnlineUsers obj)
+		{
+			List<String> users = obj.users;
+			OnlineUsersList.Items.Clear();
+			foreach (string user in users)
+			{
+				TextBlock l = new TextBlock();
+				l.Text = user;
+				OnlineUsersList.Items.Add(l);
+			}
+			GetOnlineUsersGrid.Visibility = Visibility.Visible;
+		}
+
+		private void sendGetOnlineUsersRequest()
+		{
+			var ws = wsController.getWs();
+			if (ws != null)
+			{
+				l.log("sending online users request");
+				GetOnlineUsers req = new GetOnlineUsers();
+				req.sender = Config.userName;
+				req.type = "get_online_users";
+				ws.Send(JsonConvert.SerializeObject(req));
+			}
+		}
+
 		// запрос на получение онлайн пользователей
 		private void Ellipse_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			// TODO: {sender, type : get_online_users }
+			// {sender, type : get_online_users }
+			l.log("yellow button down");
+			sendGetOnlineUsersRequest();
 		}
+
+		// cancel
+		private void OnlineUserExitClick(object sender, RoutedEventArgs e)
+		{
+			GetOnlineUsersGrid.Visibility = Visibility.Hidden;
+			isAddingUser = false;
+			addingUserChannel = null;
+			addingUserChannelDesc = null;
+		}
+
+		private bool isAddingUser;
+		private string addingUserChannel;
+		private string addingUserChannelDesc;
+		private void addUserToChannelTask(string channelName, string chDesc)
+		{
+			sendGetOnlineUsersRequest();
+			isAddingUser = true;
+			addingUserChannel = channelName;
+			addingUserChannelDesc = chDesc;
+		}
+
+		// TODO: потом сделать типо форму меню
+		private void ChannelSampleGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (!isAddingUser)
+			{
+				string chName = ((TextBlock) ((Grid) sender).Children[3]).Text;
+				string chDesc = ((TextBlock) ((Grid) sender).Children[0]).Text;
+				addUserToChannelTask(chName, chDesc);
+			}
+		}
+
+		// return true if successfully sended
+		public bool sendRequest(object obj)
+		{
+			var ws = wsController.getWs();
+			if (ws != null)
+			{
+				ws.Send(JsonConvert.SerializeObject(obj));
+				return true;
+			}
+			return false;
+		}
+
+		private void sendAddUserRequest(string user, string channel, string fullname)
+		{
+			
+			AddUser req = new AddUser();
+			req.sender = Config.userName;
+			req.user = user;
+			req.channel = channel;
+			req.fullname = fullname;
+			req.type = "add_user";
+			l.log("try send add user " + user + " to " + channel + " request");
+			if (sendRequest(req))
+			{
+				l.log("sended");
+			}
+			else
+			{
+				l.log("sending aborted");
+			}
+		}
+
+		public void dispatchIncrementChannelMembersView(string channel)
+		{
+			Dispatcher.BeginInvoke(new ThreadStart(delegate {
+				incrementChannelMembersView(channel);
+			}));
+		}
+
+		// +1 channel's members displayed
+		private void incrementChannelMembersView(string channel)
+		{
+			Grid g = getChannelGridByName(channel);
+			if (g == null)
+			{
+				l.log("no any grid with name " + channel);
+				return;
+			}
+			var usersCountBlock = (TextBlock) g.Children[2];
+			string current = usersCountBlock.Text;
+			var spl = current.Split();
+			int count = Convert.ToInt32(spl[0]);
+
+			string newStr = (count + 1) + spl[1];
+			usersCountBlock.Text = newStr;
+			l.log("updated channel members count");
+		}
+
+
+		public void getChannelRequest(string channelName)
+		{
+			ChannelRequest req = new ChannelRequest();
+			req.type = "get_channel";
+			req.name = channelName;
+			req.@from = Config.userName;
+			l.log("try send get channel " + channelName + " request");
+			if (sendRequest(req))
+			{
+				l.log("sended");
+			}
+			else
+			{
+				l.log("sending aborted");
+			}
+		}
+
+		
+
+		private void OnlineUsersList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (e.AddedItems.Count == 0)
+			{
+				return;
+			}
+			if (isAddingUser)
+			{
+				// TODO: index out of range
+				TextBlock item = (TextBlock)e.AddedItems[0];
+				string userSelected = item.Text;
+				// отправить запрос на добавление пользователя в канал
+				sendAddUserRequest(userSelected, addingUserChannel, addingUserChannelDesc);
+
+				// закрываем окно
+				/*
+				GetOnlineUsersGrid.Visibility = Visibility.Hidden;
+				isAddingUser = false;
+				addingUserChannel = null;
+				*/
+			}
+		}
+
+		
+		public void dispatchNotifyOnAddingUserResponse(string userName, string channelName, bool isSuccess)
+		{
+			Dispatcher.BeginInvoke(new ThreadStart(delegate { notifyOnAddingUserResponse(userName, channelName, isSuccess); }));
+		}
+
+
+		private void notifyOnAddingUserResponse(string userName, string channelName, bool isSuccess)
+		{
+			if (isSuccess)
+			{
+				AddingUserResponseLabel.Content = "Пользователь " + userName + " успешно добавлен в канал " + channelName;
+				AddingUserResponseLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5AF133"));
+			}
+			else
+			{
+				AddingUserResponseLabel.Content = "Не удалось добавить пользователя " + userName + " в канал " + channelName;
+				AddingUserResponseLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEE2323"));
+			}
+
+			GetOnlineUsersGrid.Visibility = Visibility.Visible;
+			AddingUserResponseLabel.Visibility = Visibility.Visible;
+		}
+		
 	}
 }

@@ -72,8 +72,6 @@ namespace ChatClient
 
 			ws.OnMessage += (sender, e) =>
 			{
-
-
 				var resp = JsonConvert.DeserializeObject<dynamic>(e.Data);
 
 
@@ -139,10 +137,14 @@ namespace ChatClient
 				// рендерит в MainWindow список каналов
 				else if ("get_channel".Equals(type))
 				{
-					JArray array = resp.channels;
-					List<dynamic> ll = array.ToObject<List<dynamic>>();
-					l.log("received channels:  " + ll.ToArray().ToString());
-					mainWindow.dispatchShowChannels(ll);
+					JArray channels = resp.channels;
+					List<dynamic> chList = channels.ToObject<List<dynamic>>();
+					l.log("received channels:  " + channels.ToString());
+
+					JArray userCounts = resp.user_counts;
+					List<Int32> counts = userCounts.ToObject<List<Int32>>();
+					l.log("received counts: " + userCounts.ToString());
+					mainWindow.dispatchShowChannels(chList, counts);
 				}
 
 				else if ("new_channel".Equals(type))
@@ -162,11 +164,62 @@ namespace ChatClient
 					
 					// serialise
 					var entities = listDynamicToMessageEntities(ll);
-					using (var db = new LiteDatabase(@"LocalData.db"))
+					try
 					{
-						var messagesCollection = db.GetCollection<MessageEntity>(ch + "_mes");
-						messagesCollection.EnsureIndex(x => x.time);
-						messagesCollection.Insert(entities);
+						using (var db = new LiteDatabase(@"LocalData.db"))
+						{
+							var messagesCollection = db.GetCollection<MessageEntity>(ch + "_mes");
+							messagesCollection.EnsureIndex(x => x.time);
+							messagesCollection.Insert(entities);
+						}
+					}
+					catch (LiteException)
+					{
+						l.log("exception in serialise (invalid ch format probably)");
+					}
+				}
+				else if ("get_online_users".Equals(type))
+				{
+					JArray array = resp.users;
+					GetOnlineUsers obj = new GetOnlineUsers();
+					obj.sender = resp.sender;
+					obj.users = array.ToObject<List<string>>();
+					obj.type = resp.type;
+					mainWindow.dispatchGetOnlineUsers(obj);
+				}
+
+				else if ("add_user".Equals(type))
+				{
+					AddUser evnt = new AddUser();
+					evnt.sender = resp.sender;
+					evnt.user = resp.user;
+					evnt.channel = resp.channel;
+					evnt.success = resp.success;
+					evnt.type = resp.type;
+					
+					
+					if (evnt.sender == Config.userName)
+					{
+						// notify about successful or not adding	
+						// display info about adding (using add user menu)
+						mainWindow.dispatchNotifyOnAddingUserResponse(evnt.user, evnt.channel, evnt.success);
+					}
+					// evnt.success apriori true here
+					else
+					{
+						// user have been added
+						if (evnt.user == Config.userName)
+						{
+							// show new channel
+							mainWindow.getChannelRequest(evnt.channel);
+						}
+						// other members of channel (exclude admin)
+						else
+						{
+							// update channel data
+							// +1 channel's members displayed
+							mainWindow.dispatchIncrementChannelMembersView(evnt.channel);
+						}
 					}
 				}
 
@@ -237,6 +290,64 @@ namespace ChatClient
 		public long time { get; set; }
 	}
 
+	//unviversal (for req(w/o success) and resp(w/o  fullname))
+	public class AddUser
+	{
+		public AddUser() {}
+		public AddUser(string sender, string user, string channel, string fullname, bool success, string type)
+		{
+			this.sender = sender;
+			this.user = user;
+			this.channel = channel;
+			this.fullname = fullname;
+			this.success = success;
+			this.type = type;
+		}
+
+		public string sender;
+		public string user;
+		public string channel;
+		public string fullname;
+		public bool success;
+		public string type;
+	}
+
+	public class GetChannelUsers
+	{
+		public GetChannelUsers(){}
+
+		public GetChannelUsers(string sender, string channel, List<string> users, string type)
+		{
+			this.sender = sender;
+			this.channel = channel;
+			this.users = users;
+			this.type = type;
+		}
+
+		public string sender;
+		public string channel;
+		public List<String> users;
+		// get_channel_users
+		public string type;
+	}
+
+	// universal (for req(w/o users) and resp)
+	public class GetOnlineUsers
+	{
+		public GetOnlineUsers() {}
+		public GetOnlineUsers(string sender, List<string> users, string type)
+		{
+			this.sender = sender;
+			this.users = users;
+			this.type = type;
+		}
+
+		public string sender;
+		public List<String> users;
+		// "get_online_users"
+		public string type;
+	}
+
 
 	// only for checking response type
 	public class CommonResponse
@@ -247,6 +358,15 @@ namespace ChatClient
 
 	public class NewChannelRequest
 	{
+		public NewChannelRequest() {}
+		public NewChannelRequest(string name, string fullname, string admin, string type)
+		{
+			this.name = name;
+			this.fullname = fullname;
+			this.admin = admin;
+			this.type = type;
+		}
+
 		public string name;
 		public string fullname;
 		public string admin;
@@ -255,6 +375,16 @@ namespace ChatClient
 
 	public class NewChannelResponse
 	{
+		public NewChannelResponse() {}
+		public NewChannelResponse(string name, string fullname, string admin, string type, bool success)
+		{
+			this.name = name;
+			this.fullname = fullname;
+			this.admin = admin;
+			this.type = type;
+			this.success = success;
+		}
+
 		public string name;
 		public string fullname;
 		public string admin;
@@ -264,6 +394,16 @@ namespace ChatClient
 
 	public class GetChannelMessagesReq
 	{
+		public GetChannelMessagesReq(){}
+
+		public GetChannelMessagesReq(string @from, string channel, long time, string type)
+		{
+			this.@from = @from;
+			this.channel = channel;
+			this.time = time;
+			this.type = type;
+		}
+
 		public string from;
 		public string channel;
 		public long time;
@@ -275,6 +415,15 @@ namespace ChatClient
 
 	public class ChannelRequest
 	{
+		public ChannelRequest() {}
+
+		public ChannelRequest(string type, string name, string @from)
+		{
+			this.type = type;
+			this.name = name;
+			this.@from = @from;
+		}
+
 		public string type;
 		// if name == '*' return all channels
 		public string name;
@@ -283,6 +432,16 @@ namespace ChatClient
 
 	public class RegRequest
 	{
+		public RegRequest() {}
+
+		public RegRequest(string type, string user, string email, string password)
+		{
+			this.type = type;
+			this.user = user;
+			this.email = email;
+			this.password = password;
+		}
+
 		public string type;
 		public string user;
 		public string email;
@@ -291,12 +450,29 @@ namespace ChatClient
 
 	public class RegResponse
 	{
+		public RegResponse() {}
+
+		public RegResponse(string type, bool success)
+		{
+			this.type = type;
+			this.success = success;
+		}
+
 		public string type;
 		public bool success;
 	}
 
 	public class AuthResponse
 	{
+		public AuthResponse() {}
+
+		public AuthResponse(string type, bool success, string[] online)
+		{
+			this.type = type;
+			this.success = success;
+			this.online = online;
+		}
+
 		public string type;
 		public bool success;
 		public string[] online;
@@ -304,6 +480,14 @@ namespace ChatClient
 
 	public class AuthRequest
 	{
+		public AuthRequest() { }
+		public AuthRequest(string type, string user, string password)
+		{
+			this.type = type;
+			this.user = user;
+			this.password = password;
+		}
+
 		public string type;
 		public string user;
 		public string password;
