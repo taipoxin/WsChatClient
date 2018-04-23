@@ -24,7 +24,13 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
     </Window.Resources>
+    
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="{x:Type MenuItem}">
+                <EventSetter Event="Click" Handler="Menu_Item_Click_Event" />
+            </Style>
+        </Grid.Resources>
         <Grid SizeChanged="Grid_SizeChanged" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -39,6 +45,12 @@
                 <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="128 участников" VerticalAlignment="Top" Height="22" Width="163" FontFamily="Tahoma" FontSize="14"/>
                 <!-- сохраняет чисто как свойство -->
                 <TextBlock Visibility="Collapsed" Text="name"/>
+
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Добавить пользователя" Name="AddUserItem" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
             </Grid>
             <!-- сообщение -->
             <Grid  Name="AnotherMessageGrid" HorizontalAlignment="Left" MaxWidth="400"  VerticalAlignment="Top" Background="#FFBEE7E8" Visibility="Collapsed">
@@ -124,12 +136,27 @@
         <Grid Name="GetOnlineUsersGrid" Visibility="Hidden">
             <Grid Background="Black" Opacity="0.4"></Grid>
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="500" Height="400" Background="#FFF6F6F6">
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Список пользователей онлайн" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold" Foreground="#FF179F7F" Margin="51,10,0,0"/>
                 <ListBox Name="OnlineUsersList" HorizontalAlignment="Center" Height="324"  VerticalAlignment="Center" Width="399" 
                     ScrollViewer.VerticalScrollBarVisibility="Hidden" SelectionChanged="OnlineUsersList_OnSelectionChanged"
                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 </ListBox>
                 <Button Content="Выход" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C" Height="19" Margin="51,0,0,10" Click="OnlineUserExitClick"/>
-                <Label Name="AddingUserResponseLabel" Content="" HorizontalAlignment="Left" Margin="173,368,0,0" VerticalAlignment="Top" Foreground="#FF5AF133" Width="149" Visibility="Hidden"/>
+                <Label Name="AddingUserResponseLabel" Content="" HorizontalAlignment="Left" Margin="173,368,0,0" VerticalAlignment="Top" Foreground="#FF5AF133" Width="277" Visibility="Hidden"/>
+
+            </Grid>
+        </Grid>
+
+        <Grid Name="GetChannelUsers" Visibility="Hidden">
+            <Grid Background="Black" Opacity="0.4"></Grid>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="500" Height="400" Background="#FFF6F6F6">
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Список пользователей канала" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold" Foreground="#FF179F7F" Margin="51,10,0,0"/>
+                <ListBox Name="ChannelUsersList" HorizontalAlignment="Center" Height="324"  VerticalAlignment="Center" Width="399" 
+                         ScrollViewer.VerticalScrollBarVisibility="Hidden" SelectionChanged="OnlineUsersList_OnSelectionChanged"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                </ListBox>
+                <Button Content="Выход" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="100" Background="White" BorderBrush="#FF7F7C7C" Foreground="#FF7F7C7C" Height="19" Margin="51,0,0,10" Click="ExitChannelUsers"/>
+                <Label Name="UserActionResponseLabel" Content="" HorizontalAlignment="Left" Margin="173,368,0,0" VerticalAlignment="Top" Foreground="#FF5AF133" Width="277" Visibility="Hidden"/>
 
             </Grid>
         </Grid>

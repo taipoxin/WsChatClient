@@ -154,6 +154,12 @@ namespace ChatClient
 			}
 			else
 			{
+				string u = UserBox.Text;
+				if (u == "test1")
+				{
+					// метод первого теста
+
+				}
 				openMainWindow();
 			}
 		}

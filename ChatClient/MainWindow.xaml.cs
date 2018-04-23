@@ -56,7 +56,7 @@ namespace ChatClient
 			var ws = wsController.getWs();
 			if (ws != null)
 			{
-				var getChannels = new ChannelRequest();
+				var getChannels = new Entities.ChannelRequest();
 				getChannels.type = "get_channel";
 				getChannels.name = "*";
 				getChannels.from = Config.userName;
@@ -64,6 +64,8 @@ namespace ChatClient
 				ws.Send(getAllCh);
 			}
 		}
+
+
 
 
 		private string currentChannel;
@@ -180,7 +182,7 @@ namespace ChatClient
 					// show
 					MessageList.Items.Add(createMyMessageGrid(MessageTextBox.Text, time));
 					// send
-					MessageResponse mes = new MessageResponse("message", MessageTextBox.Text, Config.userName, DateTimeOffset.Now.ToUnixTimeMilliseconds(), name);
+					Entities.MessageResponse mes = new Entities.MessageResponse("message", MessageTextBox.Text, Config.userName, DateTimeOffset.Now.ToUnixTimeMilliseconds(), name);
 					string jsonReq = JsonConvert.SerializeObject(mes);
 					l.log("sending message");
 					ws.Send(jsonReq);
@@ -191,8 +193,8 @@ namespace ChatClient
 					// serialise
 					using (var db = new LiteDatabase(@"LocalData.db"))
 					{
-						var messages = db.GetCollection<MessageEntity>(mes.channel + "_mes");
-						var ent = new MessageEntity { from = mes.@from, message = mes.message, time = mes.time };
+						var messages = db.GetCollection<Entities.MessageEntity>(mes.channel + "_mes");
+						var ent = new Entities.MessageEntity { from = mes.@from, message = mes.message, time = mes.time };
 						messages.Insert(ent);
 					}
 				}
@@ -241,17 +243,12 @@ namespace ChatClient
 		}
 
 
-		public void dispatchCreateChannel(NewChannelResponse m)
-		{
-			Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				createChannel(m);
-			}));
-		}
+		
 		
 		/// <summary>
 		/// retrieve new loaded channel
 		/// </summary>
-		private void createChannel(NewChannelResponse m)
+		public void createChannel(Entities.NewChannelResponse m)
 		{
 			if (m.success)
 			{
@@ -278,17 +275,12 @@ namespace ChatClient
 		}
 
 
-		public void dispatchShowChannels(List<dynamic> channels, List<Int32> counts)
-		{
-			Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				showChannels(channels, counts);
-			}));
-		}
+		
 		
 		/// <summary>
 		/// add channels from server to ChannelList
 		/// </summary>
-		private void showChannels(List<dynamic> channels, List<Int32> counts)
+		public void showChannels(List<dynamic> channels, List<Int32> counts)
 		{
 			for (int i = 0; i < channels.Count; i++)
 			{
@@ -302,16 +294,11 @@ namespace ChatClient
 		}
 
 
-		public void dispatchShowMessage(MessageResponse mes)
-		{
-			Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				showMessage(mes);
-			}));
-		}
+		
 		/// <summary>
 		/// show new messages from server for current channel
 		/// </summary>
-		private void showMessage(MessageResponse mes)
+		public void showMessage(Entities.MessageResponse mes)
 		{
 			Grid ch = (Grid)ChannelList.SelectedItems[0];
 			string name = ((TextBlock)ch.Children[3]).Text;
@@ -332,12 +319,7 @@ namespace ChatClient
 		}
 
 
-		public void dispatchShowChannelMessages(string channelName, List<dynamic> messages)
-		{
-			Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				showChannelMessages(channelName, messages);
-			}));
-		}
+		
 
 		/// <summary>
 		/// display channel messages from server, if channel is chosen
@@ -456,7 +438,7 @@ namespace ChatClient
 		}
 
 
-		public void showChannelInnerMessages(string channelName, List<MessageEntity> messages)
+		public void showChannelInnerMessages(string channelName, List<Entities.MessageEntity> messages)
 		{
 			// смотрим, какой канал сейчас выбран
 			Grid ch = (Grid)ChannelList.SelectedItems[0];
@@ -464,7 +446,7 @@ namespace ChatClient
 			if (channelName == name)
 			{
 				// рендерим список сообщений
-				foreach (MessageEntity m in messages)
+				foreach (Entities.MessageEntity m in messages)
 				{
 					string mes = m.message;
 					string fr = m.from;
@@ -490,7 +472,7 @@ namespace ChatClient
 			// храним: {message, from, time}
 			using (var db = new LiteDatabase(@"LocalData.db"))
 			{
-				var messages = db.GetCollection<MessageEntity>(channelName + "_mes");
+				var messages = db.GetCollection<Entities.MessageEntity>(channelName + "_mes");
 
 				var mes = messages.FindAll();
 				mes = mes.OrderBy(x => x.time);
@@ -501,7 +483,7 @@ namespace ChatClient
 					var ws = wsController.getWs();
 					if (ws != null)
 					{
-						var getChannelMessages = new GetChannelMessagesReq();
+						var getChannelMessages = new Entities.GetChannelMessagesReq();
 						getChannelMessages.type = "get_channel_messages";
 						getChannelMessages.channel = channelName;
 						getChannelMessages.from = Config.userName;
@@ -521,7 +503,7 @@ namespace ChatClient
 					var ws = wsController.getWs();
 					if (ws != null)
 					{
-						var getChannelMessages = new GetChannelMessagesReq();
+						var getChannelMessages = new Entities.GetChannelMessagesReq();
 						getChannelMessages.type = "get_channel_messages";
 						getChannelMessages.channel = channelName;
 						getChannelMessages.from = Config.userName;
@@ -606,7 +588,7 @@ namespace ChatClient
 			var ws = wsController.getWs();
 			if (ws != null)
 			{
-				NewChannelRequest r = new NewChannelRequest();
+				Entities.NewChannelRequest r = new Entities.NewChannelRequest();
 				r.type = "new_channel";
 				r.name = name;
 				r.fullname = fullname;
@@ -630,14 +612,31 @@ namespace ChatClient
 			sending = false;
 		}
 
-		public void dispatchGetOnlineUsers(GetOnlineUsers obj)
+		
+
+		public void getChannelUsers(Entities.GetChannelUsers obj)
 		{
-			Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				getOnlineUsers(obj);
-			}));
+			List<Entities.User> users = obj.users;
+			ChannelUsersList.Items.Clear();
+			foreach (Entities.User user in users)
+			{
+				TextBlock l = new TextBlock();
+				if (user.type != null)
+				{
+					l.Text = user.login + " (" + user.type + ")";
+				}
+				else
+				{ 
+					l.Text = user.login;
+				}
+				ChannelUsersList.Items.Add(l);
+			}
+			GetChannelUsers.Visibility = Visibility.Visible;
 		}
 
-		public void getOnlineUsers(GetOnlineUsers obj)
+		
+
+		public void getOnlineUsers(Entities.GetOnlineUsers obj)
 		{
 			List<String> users = obj.users;
 			OnlineUsersList.Items.Clear();
@@ -656,9 +655,23 @@ namespace ChatClient
 			if (ws != null)
 			{
 				l.log("sending online users request");
-				GetOnlineUsers req = new GetOnlineUsers();
+				Entities.GetOnlineUsers req = new Entities.GetOnlineUsers();
 				req.sender = Config.userName;
 				req.type = "get_online_users";
+				ws.Send(JsonConvert.SerializeObject(req));
+			}
+		}
+
+		private void sendGetChannelUsersRequest(string channel)
+		{
+			var ws = wsController.getWs();
+			if (ws != null)
+			{
+				l.log("sending get channel users request");
+				Entities.GetChannelUsers req = new Entities.GetChannelUsers();
+				req.sender = Config.userName;
+				req.type = "get_channel_users";
+				req.channel = channel;
 				ws.Send(JsonConvert.SerializeObject(req));
 			}
 		}
@@ -668,7 +681,11 @@ namespace ChatClient
 		{
 			// {sender, type : get_online_users }
 			l.log("yellow button down");
-			sendGetOnlineUsersRequest();
+			if (ChannelList.SelectedItems.Count == 0) return;
+			Grid ch = (Grid)ChannelList.SelectedItems[0];
+			string chName = ((TextBlock)ch.Children[3]).Text;
+
+			sendGetChannelUsersRequest(chName);
 		}
 
 		// cancel
@@ -678,6 +695,7 @@ namespace ChatClient
 			isAddingUser = false;
 			addingUserChannel = null;
 			addingUserChannelDesc = null;
+			AddingUserResponseLabel.Visibility = Visibility.Hidden;
 		}
 
 		private bool isAddingUser;
@@ -691,15 +709,25 @@ namespace ChatClient
 			addingUserChannelDesc = chDesc;
 		}
 
+
+		private bool isGettingChannelUsers;
+		private string gettingChannelUsers;
+		private void getChannelUsersTask(string channelName)
+		{
+			sendGetChannelUsersRequest(channelName);
+			isGettingChannelUsers = true;
+			gettingChannelUsers = channelName;
+		}
+
+
+
+		private Grid currentRightClickGrid;
+
 		// TODO: потом сделать типо форму меню
 		private void ChannelSampleGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (!isAddingUser)
-			{
-				string chName = ((TextBlock) ((Grid) sender).Children[3]).Text;
-				string chDesc = ((TextBlock) ((Grid) sender).Children[0]).Text;
-				addUserToChannelTask(chName, chDesc);
-			}
+			currentRightClickGrid = (Grid)sender;
+
 		}
 
 		// return true if successfully sended
@@ -717,7 +745,7 @@ namespace ChatClient
 		private void sendAddUserRequest(string user, string channel, string fullname)
 		{
 			
-			AddUser req = new AddUser();
+			Entities.AddUser req = new Entities.AddUser();
 			req.sender = Config.userName;
 			req.user = user;
 			req.channel = channel;
@@ -734,15 +762,10 @@ namespace ChatClient
 			}
 		}
 
-		public void dispatchIncrementChannelMembersView(string channel)
-		{
-			Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				incrementChannelMembersView(channel);
-			}));
-		}
+		
 
 		// +1 channel's members displayed
-		private void incrementChannelMembersView(string channel)
+		public void incrementChannelMembersView(string channel)
 		{
 			Grid g = getChannelGridByName(channel);
 			if (g == null)
@@ -763,7 +786,7 @@ namespace ChatClient
 
 		public void getChannelRequest(string channelName)
 		{
-			ChannelRequest req = new ChannelRequest();
+			Entities.ChannelRequest req = new Entities.ChannelRequest();
 			req.type = "get_channel";
 			req.name = channelName;
 			req.@from = Config.userName;
@@ -778,7 +801,7 @@ namespace ChatClient
 			}
 		}
 
-		
+
 
 		private void OnlineUsersList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
@@ -789,43 +812,68 @@ namespace ChatClient
 			if (isAddingUser)
 			{
 				// TODO: index out of range
-				TextBlock item = (TextBlock)e.AddedItems[0];
+				TextBlock item = (TextBlock) e.AddedItems[0];
 				string userSelected = item.Text;
 				// отправить запрос на добавление пользователя в канал
 				sendAddUserRequest(userSelected, addingUserChannel, addingUserChannelDesc);
 
-				// закрываем окно
-				/*
-				GetOnlineUsersGrid.Visibility = Visibility.Hidden;
-				isAddingUser = false;
-				addingUserChannel = null;
-				*/
 			}
 		}
 
-		
-		public void dispatchNotifyOnAddingUserResponse(string userName, string channelName, bool isSuccess)
-		{
-			Dispatcher.BeginInvoke(new ThreadStart(delegate { notifyOnAddingUserResponse(userName, channelName, isSuccess); }));
-		}
 
-
-		private void notifyOnAddingUserResponse(string userName, string channelName, bool isSuccess)
+		public void notifyOnAddingUserResponse(string userName, string channelName, bool isSuccess)
 		{
 			if (isSuccess)
 			{
-				AddingUserResponseLabel.Content = "Пользователь " + userName + " успешно добавлен в канал " + channelName;
+				AddingUserResponseLabel.Content = userName + " успешно добавлен";
 				AddingUserResponseLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5AF133"));
 			}
 			else
 			{
-				AddingUserResponseLabel.Content = "Не удалось добавить пользователя " + userName + " в канал " + channelName;
+				AddingUserResponseLabel.Content = "Не удалось добавить " + userName;
 				AddingUserResponseLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEE2323"));
 			}
 
 			GetOnlineUsersGrid.Visibility = Visibility.Visible;
 			AddingUserResponseLabel.Visibility = Visibility.Visible;
 		}
-		
+
+		private void Menu_Item_Click_Event(object sender, RoutedEventArgs e)
+		{
+			if (((MenuItem)sender).Name == "AddUserItem")
+			{
+				if (!isAddingUser)
+				{
+					Grid g = currentRightClickGrid;
+					string chName = ((TextBlock)g.Children[3]).Text;
+					string chDesc = ((TextBlock)g.Children[0]).Text;
+					addUserToChannelTask(chName, chDesc);
+				}
+
+			}
+		}
+
+		private void openChannelUsersGrid()
+		{
+			// отправляем реквест на пользователей данного канала
+			// при получении загружаем этот список
+		}
+		// TODO: пофиксить
+		// шапка канала - надпись о списке участников
+		private void TextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			openChannelUsersGrid();
+		}
+
+		private void closeChannelUsersGrid()
+		{
+			GetChannelUsers.Visibility = Visibility.Hidden;
+			UserActionResponseLabel.Visibility = Visibility.Hidden;
+		}
+
+		private void ExitChannelUsers(object sender, RoutedEventArgs e)
+		{
+			closeChannelUsersGrid();
+		}
 	}
 }

@@ -82,6 +82,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Config.cs" />
+    <Compile Include="Dispatchers.cs" />
+    <Compile Include="Entities.cs" />
     <Compile Include="FileLogger.cs" />
     <Compile Include="GenericsWPF.cs" />
     <Compile Include="MainWindow.xaml.cs">

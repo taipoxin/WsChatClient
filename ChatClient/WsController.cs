@@ -17,6 +17,7 @@ namespace ChatClient
 	{
 		// core low level ws client
 		private WebSocket ws;
+
 		private FileLogger l = new FileLogger(Config.logFileName);
 
 		// links for view classes
@@ -60,7 +61,7 @@ namespace ChatClient
 		{
 			ws = initWebSocket();
 		}
-		
+
 		/// <summary>
 		/// initialise webSocket client with all configured listeners
 		/// </summary>
@@ -96,21 +97,21 @@ namespace ChatClient
 				else if ("message".Equals(type))
 				{
 					l.log("new message");
-					MessageResponse m = dynamicToMessageResponse(resp);
+					Entities.MessageResponse m = dynamicToMessageResponse(resp);
 					while (mainWindow == null)
 					{
 						l.log("another sleep");
 						Thread.Sleep(100);
 					}
 					// show
-					mainWindow.dispatchShowMessage(m);
+					Dispatchers.dispatchShowMessage(m, mainWindow);
 
 					// serialise
 					string channelName = m.channel;
-					var ent = new MessageEntity { from = m.@from, message = m.message, time = m.time};
+					var ent = new Entities.MessageEntity {from = m.@from, message = m.message, time = m.time};
 					using (var db = new LiteDatabase(@"LocalData.db"))
 					{
-						var messagesCollection = db.GetCollection<MessageEntity>(channelName + "_mes");
+						var messagesCollection = db.GetCollection<Entities.MessageEntity>(channelName + "_mes");
 						messagesCollection.Insert(ent);
 					}
 
@@ -144,13 +145,13 @@ namespace ChatClient
 					JArray userCounts = resp.user_counts;
 					List<Int32> counts = userCounts.ToObject<List<Int32>>();
 					l.log("received counts: " + userCounts.ToString());
-					mainWindow.dispatchShowChannels(chList, counts);
+					Dispatchers.dispatchShowChannels(chList, counts, mainWindow);
 				}
 
 				else if ("new_channel".Equals(type))
 				{
-					NewChannelResponse m = dynamicToNewChannelResponse(resp);
-					mainWindow.dispatchCreateChannel(m);
+					Entities.NewChannelResponse m = dynamicToNewChannelResponse(resp);
+					Dispatchers.dispatchCreateChannel(m, mainWindow);
 				}
 				else if ("get_channel_messages".Equals(type))
 				{
@@ -160,15 +161,15 @@ namespace ChatClient
 
 					l.log("received messages for channel " + ch + " are " + array.ToString());
 					// show
-					mainWindow.dispatchShowChannelMessages(ch, ll);
-					
+					Dispatchers.dispatchShowChannelMessages(ch, ll, mainWindow);
+
 					// serialise
 					var entities = listDynamicToMessageEntities(ll);
 					try
 					{
 						using (var db = new LiteDatabase(@"LocalData.db"))
 						{
-							var messagesCollection = db.GetCollection<MessageEntity>(ch + "_mes");
+							var messagesCollection = db.GetCollection<Entities.MessageEntity>(ch + "_mes");
 							messagesCollection.EnsureIndex(x => x.time);
 							messagesCollection.Insert(entities);
 						}
@@ -181,28 +182,28 @@ namespace ChatClient
 				else if ("get_online_users".Equals(type))
 				{
 					JArray array = resp.users;
-					GetOnlineUsers obj = new GetOnlineUsers();
+					Entities.GetOnlineUsers obj = new Entities.GetOnlineUsers();
 					obj.sender = resp.sender;
 					obj.users = array.ToObject<List<string>>();
 					obj.type = resp.type;
-					mainWindow.dispatchGetOnlineUsers(obj);
+					Dispatchers.dispatchGetOnlineUsers(obj, mainWindow);
 				}
 
 				else if ("add_user".Equals(type))
 				{
-					AddUser evnt = new AddUser();
+					Entities.AddUser evnt = new Entities.AddUser();
 					evnt.sender = resp.sender;
 					evnt.user = resp.user;
 					evnt.channel = resp.channel;
 					evnt.success = resp.success;
 					evnt.type = resp.type;
-					
-					
+
+
 					if (evnt.sender == Config.userName)
 					{
 						// notify about successful or not adding	
 						// display info about adding (using add user menu)
-						mainWindow.dispatchNotifyOnAddingUserResponse(evnt.user, evnt.channel, evnt.success);
+						Dispatchers.dispatchNotifyOnAddingUserResponse(evnt.user, evnt.channel, evnt.success, mainWindow);
 					}
 					// evnt.success apriori true here
 					else
@@ -218,9 +219,19 @@ namespace ChatClient
 						{
 							// update channel data
 							// +1 channel's members displayed
-							mainWindow.dispatchIncrementChannelMembersView(evnt.channel);
+							Dispatchers.dispatchIncrementChannelMembersView(evnt.channel, mainWindow);
 						}
 					}
+				}
+				else if ("get_channel_users".Equals(type))
+				{
+					JArray array = resp.users;
+					Entities.GetChannelUsers obj = new Entities.GetChannelUsers();
+					obj.sender = resp.sender;
+					obj.channel = resp.channel;
+					obj.users = array.ToObject<List<Entities.User>>();
+					obj.type = resp.type;
+					Dispatchers.dispatchGetChannelUsers(obj, mainWindow);
 				}
 
 			};
@@ -235,15 +246,15 @@ namespace ChatClient
 			return ws;
 		}
 
-		private List<MessageEntity> listDynamicToMessageEntities(List<dynamic> ll)
+		private List<Entities.MessageEntity> listDynamicToMessageEntities(List<dynamic> ll)
 		{
-			List<MessageEntity> entities = new List<MessageEntity>(ll.Capacity);
+			List<Entities.MessageEntity> entities = new List<Entities.MessageEntity>(ll.Capacity);
 			foreach (dynamic m in ll)
 			{
 				string fr = m.from;
 				string mes = m.message;
 				long t = m.time;
-				var mess = new MessageEntity { from = fr, message = mes, time = t };
+				var mess = new Entities.MessageEntity {from = fr, message = mes, time = t};
 				entities.Add(mess);
 			}
 			return entities;
@@ -254,24 +265,25 @@ namespace ChatClient
 			while (!ws.IsAlive)
 			{
 				// about 2 second to connect
-				ws.Connect(); ;
+				ws.Connect();
+				;
 			}
 			l.log("ws connected");
 		}
 
-		private MessageResponse dynamicToMessageResponse(dynamic obj)
+		private Entities.MessageResponse dynamicToMessageResponse(dynamic obj)
 		{
 			string from = obj.from;
 			string type = obj.type;
-			long   time = obj.time;
+			long time = obj.time;
 			string message = obj.message;
 			string channel = obj.channel;
-			return new MessageResponse(type, message, from, time, channel);
+			return new Entities.MessageResponse(type, message, from, time, channel);
 		}
 
-		private NewChannelResponse  dynamicToNewChannelResponse(dynamic obj)
+		private Entities.NewChannelResponse dynamicToNewChannelResponse(dynamic obj)
 		{
-			var ch = new NewChannelResponse();
+			var ch = new Entities.NewChannelResponse();
 			ch.name = obj.name;
 			ch.fullname = obj.fullname;
 			ch.admin = obj.admin;
@@ -279,239 +291,6 @@ namespace ChatClient
 			ch.type = obj.type;
 			return ch;
 		}
-
-	}
-
-	public class MessageEntity
-	{
-		public Guid Id { get; set; }
-		public string from { get; set; }
-		public string message { get; set; }
-		public long time { get; set; }
-	}
-
-	//unviversal (for req(w/o success) and resp(w/o  fullname))
-	public class AddUser
-	{
-		public AddUser() {}
-		public AddUser(string sender, string user, string channel, string fullname, bool success, string type)
-		{
-			this.sender = sender;
-			this.user = user;
-			this.channel = channel;
-			this.fullname = fullname;
-			this.success = success;
-			this.type = type;
-		}
-
-		public string sender;
-		public string user;
-		public string channel;
-		public string fullname;
-		public bool success;
-		public string type;
-	}
-
-	public class GetChannelUsers
-	{
-		public GetChannelUsers(){}
-
-		public GetChannelUsers(string sender, string channel, List<string> users, string type)
-		{
-			this.sender = sender;
-			this.channel = channel;
-			this.users = users;
-			this.type = type;
-		}
-
-		public string sender;
-		public string channel;
-		public List<String> users;
-		// get_channel_users
-		public string type;
-	}
-
-	// universal (for req(w/o users) and resp)
-	public class GetOnlineUsers
-	{
-		public GetOnlineUsers() {}
-		public GetOnlineUsers(string sender, List<string> users, string type)
-		{
-			this.sender = sender;
-			this.users = users;
-			this.type = type;
-		}
-
-		public string sender;
-		public List<String> users;
-		// "get_online_users"
-		public string type;
-	}
-
-
-	// only for checking response type
-	public class CommonResponse
-	{
-		public string type;
-	}
-
-
-	public class NewChannelRequest
-	{
-		public NewChannelRequest() {}
-		public NewChannelRequest(string name, string fullname, string admin, string type)
-		{
-			this.name = name;
-			this.fullname = fullname;
-			this.admin = admin;
-			this.type = type;
-		}
-
-		public string name;
-		public string fullname;
-		public string admin;
-		public string type;
-	}
-
-	public class NewChannelResponse
-	{
-		public NewChannelResponse() {}
-		public NewChannelResponse(string name, string fullname, string admin, string type, bool success)
-		{
-			this.name = name;
-			this.fullname = fullname;
-			this.admin = admin;
-			this.type = type;
-			this.success = success;
-		}
-
-		public string name;
-		public string fullname;
-		public string admin;
-		public string type;
-		public bool success;
-	}
-
-	public class GetChannelMessagesReq
-	{
-		public GetChannelMessagesReq(){}
-
-		public GetChannelMessagesReq(string @from, string channel, long time, string type)
-		{
-			this.@from = @from;
-			this.channel = channel;
-			this.time = time;
-			this.type = type;
-		}
-
-		public string from;
-		public string channel;
-		public long time;
-		// "get_channel_messages"
-		public string type;
-
-	}
-
-
-	public class ChannelRequest
-	{
-		public ChannelRequest() {}
-
-		public ChannelRequest(string type, string name, string @from)
-		{
-			this.type = type;
-			this.name = name;
-			this.@from = @from;
-		}
-
-		public string type;
-		// if name == '*' return all channels
-		public string name;
-		public string from;
-	}
-
-	public class RegRequest
-	{
-		public RegRequest() {}
-
-		public RegRequest(string type, string user, string email, string password)
-		{
-			this.type = type;
-			this.user = user;
-			this.email = email;
-			this.password = password;
-		}
-
-		public string type;
-		public string user;
-		public string email;
-		public string password;
-	}
-
-	public class RegResponse
-	{
-		public RegResponse() {}
-
-		public RegResponse(string type, bool success)
-		{
-			this.type = type;
-			this.success = success;
-		}
-
-		public string type;
-		public bool success;
-	}
-
-	public class AuthResponse
-	{
-		public AuthResponse() {}
-
-		public AuthResponse(string type, bool success, string[] online)
-		{
-			this.type = type;
-			this.success = success;
-			this.online = online;
-		}
-
-		public string type;
-		public bool success;
-		public string[] online;
-	}
-
-	public class AuthRequest
-	{
-		public AuthRequest() { }
-		public AuthRequest(string type, string user, string password)
-		{
-			this.type = type;
-			this.user = user;
-			this.password = password;
-		}
-
-		public string type;
-		public string user;
-		public string password;
-	}
-
-	public class MessageResponse
-	{
-		public MessageResponse() {}
-
-		public MessageResponse(string type, string message, string @from, long time, string channel)
-		{
-			this.type = type;
-			this.message = message;
-			this.@from = @from;
-			this.time = time;
-			this.channel = channel;
-		}
-
-		public string from;
-		public string message;
-		public string channel;
-		// ms from 1970
-		public long time;
-		public string type;
 
 	}
 }
