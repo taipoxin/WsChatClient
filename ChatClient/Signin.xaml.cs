@@ -116,9 +116,9 @@ namespace ChatClient
 				window.Close();
 		}
 
-		private AuthRequest createRequest(string user, string password)
+		private Entities.AuthRequest createRequest(string user, string password)
 		{
-			AuthRequest r = new AuthRequest();
+			Entities.AuthRequest r = new Entities.AuthRequest();
 			r.type = "authorize";
 			r.user = user;
 			r.password = password;

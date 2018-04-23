@@ -57,9 +57,9 @@ namespace ChatClient
 			wsController = c;
 		}
 
-		private RegRequest createRegRequest(string user, string email, string password)
+		private Entities.RegRequest createRegRequest(string user, string email, string password)
 		{
-			RegRequest r = new RegRequest();
+			Entities.RegRequest r = new Entities.RegRequest();
 			r.type = "register";
 			r.user = user;
 			r.email = email;

@@ -212,7 +212,7 @@ namespace ChatClient
 						if (evnt.user == Config.userName)
 						{
 							// show new channel
-							mainWindow.getChannelRequest(evnt.channel);
+							mainWindow.globalChannel.getChannelRequest(evnt.channel);
 						}
 						// other members of channel (exclude admin)
 						else
