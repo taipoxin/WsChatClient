@@ -31,7 +31,26 @@ namespace ChatClient
 			InitializeComponent();
 		}
 
-		
+		public GlobalChannel globalChannel;
+		public GlobalMessages globalMessages;
+
+		private string currentChannel;
+		// using when send user's messages
+		public string userIdentification = "Me";
+		// used for counting created channels
+		private int indx = 1;
+
+		// if ChannelGrid state is Collapsed
+		private bool isCollapsed = false;
+
+		// контроль отправки на сервер
+		public bool sending = false;
+		// время отправки запроса на сервер
+		private long sendTime;
+
+		public WsController wsController;
+		private FileLogger l = new FileLogger(Config.logFileName);
+
 
 		/// <summary>
 		/// runs after rendering window; 
@@ -59,29 +78,12 @@ namespace ChatClient
 			}
 		}
 
-		public GlobalChannel globalChannel;
-		public GlobalMessages globalMessages;
-
-
-		private string currentChannel;
-		// using when send user's messages
-		public string userIdentification = "Me";
-		// used for counting created channels
-		private int indx = 1;
-
-
-		public WsController wsController;
-		private FileLogger l = new FileLogger(Config.logFileName);
 
 		public void setWsController(WsController c)
 		{
 			c.setMainWindow(this);
 			wsController = c;
 		}
-
-
-		
-
 
 		/// <summary>
 		/// on 'Enter' key method sends message
@@ -90,54 +92,22 @@ namespace ChatClient
 		{
 			if (e.Key == Key.Return)
 			{
-				globalMessages.readFromTextBoxAndSend();
+				if (((TextBlock) ChatHeader.Children[0]).Text != "")
+				{
+					globalMessages.readMessageFromTextBoxAndSendIt();
+				}
 			}
 		}
 
 		private void EllipseMessage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			globalMessages.readFromTextBoxAndSend();
-		}
-
-		// serialisation methods
-		private string WriteFromArrayOfObjectsToJson(MessageBean[] beans)
-		{
-			return JsonConvert.SerializeObject(beans);
-		}
-		private MessageBean MessageGridToObject(Grid messageGrid)
-		{
-			var ch = messageGrid.Children;
-			string sender = ((TextBlock)ch[0]).Text;
-			string message = ((TextBlock)ch[1]).Text;
-			string time = ((TextBlock)ch[2]).Text;
-			return new MessageBean(sender, message, time);
-		}
-		private MessageBean[] MessageListGridsToObjectArray(MainWindow w)
-		{
-			int count = w.MessageList.Items.Count;
-			MessageBean[] beans = new MessageBean[count];
-			for (int i = 0; i < count; i++)
+			if (((TextBlock) ChatHeader.Children[0]).Text != "")
 			{
-				MessageBean b = MessageGridToObject((Grid)w.MessageList.Items[i]);
-				beans[i] = b;
+				globalMessages.readMessageFromTextBoxAndSendIt();
 			}
-			return beans;
 		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-		// if ChannelGrid state is Collapsed
-		private bool isCollapsed = false;
+	
 
 		/// <summary>
 		/// button hide channel list
@@ -190,9 +160,6 @@ namespace ChatClient
 			}
 		}
 
-
-
-
 		/// <summary>
 		/// changed selection
 		/// </summary>
@@ -201,7 +168,7 @@ namespace ChatClient
 			Grid channel = (Grid) e.AddedItems[0];
 			TextBlock nameBlock = (TextBlock)channel.Children[0];
 			TextBlock countBlock = (TextBlock)channel.Children[2];
-			globalChannel.changeHeader(nameBlock, countBlock);
+			globalChannel.changeChatHeader(nameBlock, countBlock);
 
 			// меняем шапку
 			// очищаем messageList (и сохраняем messageList иного канала)
@@ -209,7 +176,7 @@ namespace ChatClient
 			// отправляем запрос на получение истории данного канала
 			string chName = ((TextBlock)channel.Children[3]).Text;
 			MessageList.Items.Clear();
-			globalMessages.findAndRequireMessages(chName);
+			globalMessages.loadLocalAndRemoteChannelMessages(chName);
 		}
 
 
@@ -231,10 +198,7 @@ namespace ChatClient
 
 		}
 
-		// контроль отправки на сервер
-		public bool sending = false;
-		// время отправки запроса на сервер
-		private long sendTime;
+
 		private void CreateChannelButtonClick(object sender, RoutedEventArgs e)
 		{
 			if (sending)
@@ -308,7 +272,7 @@ namespace ChatClient
 		// cancel
 		private void OnlineUserExitClick(object sender, RoutedEventArgs e)
 		{
-			globalChannel.closeOnlineUserGrid();
+			globalChannel.closeOnlineUsersGrid();
 		}
 
 
@@ -323,7 +287,7 @@ namespace ChatClient
 		// +1 channel's members displayed
 		public void incrementChannelMembersView(string channel)
 		{
-			Grid g = globalChannel.getChannelGridByName(channel);
+			Grid g = globalChannel.findChannelGridByName(channel);
 			if (g == null)
 			{
 				l.log("no any grid with name " + channel);
@@ -334,7 +298,7 @@ namespace ChatClient
 			var spl = current.Split();
 			int count = Convert.ToInt32(spl[0]);
 
-			string newStr = (count + 1) + spl[1];
+			string newStr = (count + 1) +" " + spl[1];
 			usersCountBlock.Text = newStr;
 			l.log("updated channel members count");
 		}
@@ -364,6 +328,7 @@ namespace ChatClient
 			{
 				AddingUserResponseLabel.Content = userName + " успешно добавлен";
 				AddingUserResponseLabel.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5AF133"));
+				incrementChannelMembersView(channelName);
 			}
 			else
 			{
@@ -384,7 +349,7 @@ namespace ChatClient
 					Grid g = globalChannel.currentRightClickGrid;
 					string chName = ((TextBlock)g.Children[3]).Text;
 					string chDesc = ((TextBlock)g.Children[0]).Text;
-					globalChannel.addUserToChannelTask(chName, chDesc);
+					globalChannel.addUserToChannelTaskSending(chName, chDesc);
 				}
 
 			}

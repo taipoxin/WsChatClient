@@ -72,7 +72,6 @@ namespace ChatClient
 		}
 
 
-
 		/// <summary>
 		/// we retrieve long time from server and view it in message grids
 		/// </summary>
@@ -95,8 +94,6 @@ namespace ChatClient
 		{
 			return DateTime.Now.ToString(@"HH\:mm");
 		}
-
-		
 		
 
 		/// <summary>
@@ -107,6 +104,28 @@ namespace ChatClient
 		public static double getCenter(double resolution, double actual)
 		{
 			return (resolution - actual) / 2;
+		}
+
+
+		public static Entities.MessageResponse dynamicToMessageResponse(dynamic obj)
+		{
+			string from = obj.from;
+			string type = obj.type;
+			long time = obj.time;
+			string message = obj.message;
+			string channel = obj.channel;
+			return new Entities.MessageResponse(type, message, from, time, channel);
+		}
+
+		public static Entities.NewChannelResponse dynamicToNewChannelResponse(dynamic obj)
+		{
+			var ch = new Entities.NewChannelResponse();
+			ch.name = obj.name;
+			ch.fullname = obj.fullname;
+			ch.admin = obj.admin;
+			ch.success = obj.success;
+			ch.type = obj.type;
+			return ch;
 		}
 
 	}

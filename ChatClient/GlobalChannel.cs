@@ -18,14 +18,12 @@ namespace ChatClient
 		}
 		private MainWindow w;
 
-
-
 		public bool isAddingUser;
 		public string addingUserChannel;
 		public string addingUserChannelDesc;
 
-		public bool isGettingChannelUsers;
-		public string gettingChannelUsers;
+		private bool isGettingChannelUsers;
+		private string gettingChannelUsers;
 
 		public Grid currentRightClickGrid;
 
@@ -34,7 +32,7 @@ namespace ChatClient
 		/// create channelGrid with selected params;
 		/// other params are getted from pattern;
 		/// </summary>
-		public Grid createChannelGrid(string fullname, int newM, int users, string name)
+		private Grid createChannelGrid(string fullname, int newM, int users, string name)
 		{
 			var g1 = GenericsWPF<Grid>.DeepDarkCopy(w.ChannelSampleGrid);
 			g1.Visibility = Visibility.Visible;
@@ -47,7 +45,7 @@ namespace ChatClient
 			return g1;
 		}
 
-		public void getChannelRequest(string channelName)
+		public void generateChannelRequest(string channelName)
 		{
 			Entities.ChannelRequest req = new Entities.ChannelRequest();
 			req.type = "get_channel";
@@ -64,17 +62,24 @@ namespace ChatClient
 			}
 		}
 
-
-		public void closeOnlineUserGrid()
+		/// <summary>
+		/// Calling on exit button in onlineusergrid
+		/// </summary>
+		public void closeOnlineUsersGrid()
 		{
 			w.GetOnlineUsersGrid.Visibility = Visibility.Hidden;
+			w.AddingUserResponseLabel.Visibility = Visibility.Hidden;
 			isAddingUser = false;
 			addingUserChannel = null;
 			addingUserChannelDesc = null;
-			w.AddingUserResponseLabel.Visibility = Visibility.Hidden;
 		}
 
-		public void addUserToChannelTask(string channelName, string chDesc)
+		/// <summary>
+		/// Calling when we want to add user to channel using server
+		/// </summary>
+		/// <param name="channelName"></param>
+		/// <param name="chDesc"></param>
+		public void addUserToChannelTaskSending(string channelName, string chDesc)
 		{
 			Utils.sendGetOnlineUsersRequest(w.wsController);
 			isAddingUser = true;
@@ -83,8 +88,11 @@ namespace ChatClient
 		}
 
 
-
-		public void getChannelUsersTask(string channelName)
+		/// <summary>
+		/// get channel members from server
+		/// </summary>
+		/// <param name="channelName"></param>
+		public void getChannelUsersTaskSending(string channelName)
 		{
 			Utils.sendGetChannelUsersRequest(channelName, w.wsController);
 			isGettingChannelUsers = true;
@@ -92,7 +100,7 @@ namespace ChatClient
 		}
 
 
-		public void getChannelUsers(Entities.GetChannelUsers obj)
+		public void getChannelUsersReceived(Entities.GetChannelUsers obj)
 		{
 			List<Entities.User> users = obj.users;
 			w.ChannelUsersList.Items.Clear();
@@ -114,7 +122,7 @@ namespace ChatClient
 
 
 
-		public void getOnlineUsers(Entities.GetOnlineUsers obj)
+		public void getOnlineUsersReceived(Entities.GetOnlineUsers obj)
 		{
 			List<String> users = obj.users;
 			w.OnlineUsersList.Items.Clear();
@@ -130,7 +138,7 @@ namespace ChatClient
 		/// <summary>
 		/// change chatHeaders name and count of members from parameters text variables
 		/// </summary>
-		public void changeHeader(TextBlock nameBlockFrom, TextBlock countBlockFrom)
+		public void changeChatHeader(TextBlock nameBlockFrom, TextBlock countBlockFrom)
 		{
 			TextBlock chatNameBlock = (TextBlock)w.ChatHeader.Children[0];
 			TextBlock chatCountBlock = (TextBlock)w.ChatHeader.Children[1];
@@ -139,7 +147,8 @@ namespace ChatClient
 			chatCountBlock.Text = countBlockFrom.Text;
 		}
 
-		public Grid getChannelGridByName(string channelName)
+	
+		public Grid findChannelGridByName(string channelName)
 		{
 			foreach (Grid chGrid in w.ChannelList.Items)
 			{
@@ -154,8 +163,13 @@ namespace ChatClient
 		/// <summary>
 		/// add channels from server to ChannelList
 		/// </summary>
-		public void showChannels(List<dynamic> channels, List<Int32> counts)
+		public void getChannelsReceived(List<dynamic> channels, List<Int32> counts)
 		{
+			if (channels.Count == 0)
+			{
+				// TODO написать, что у пользователя пока нет ни одного канала
+
+			}
 			for (int i = 0; i < channels.Count; i++)
 			{
 				dynamic ch = channels[i];
@@ -165,12 +179,13 @@ namespace ChatClient
 				Grid g = createChannelGrid(fn, 0, user_count, n);
 				w.ChannelList.Items.Add(g);
 			}
+			
 		}
 
 		/// <summary>
 		/// retrieve new loaded channel
 		/// </summary>
-		public void createChannel(Entities.NewChannelResponse m)
+		public void createChannelReceived(Entities.NewChannelResponse m)
 		{
 			if (m.success)
 			{

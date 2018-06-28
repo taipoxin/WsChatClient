@@ -100,8 +100,8 @@
 
                 <!-- шапка канала -->
                 <Grid Name="ChatHeader"  Background="#FF253F96" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="55" Margin="55,0,0,0">
-                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="ChannelName" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold" Foreground="White"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="количество участников" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14" Foreground="White"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"  Width="307" FontSize="14" FontFamily="Tahoma" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,10" TextWrapping="Wrap" Text="" VerticalAlignment="Bottom"  Width="300" FontFamily="Tahoma" FontSize="14" Foreground="White"/>
                     <Ellipse Fill="#FFE1EA17" HorizontalAlignment="Right" Height="43" Stroke="Black" VerticalAlignment="Bottom" Width="43" StrokeThickness="2" Margin="0,0,7,5" RenderTransformOrigin="0.514,0.5" MouseLeftButtonDown="Ellipse_MouseLeftButtonDown" Visibility="Visible"/>
                 </Grid>
                 <!-- список сообщений -->

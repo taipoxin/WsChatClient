@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,6 +48,12 @@ namespace ChatClient
 		/// </summary>
 		public WsController()
 		{
+			// ignore bad ws cert
+			ServicePointManager
+					.ServerCertificateValidationCallback +=
+				(sender, cert, chain, sslPolicyErrors) => true;
+
+
 			Thread t = new Thread(new ThreadStart(initWs));
 			t.IsBackground = true;
 			t.Start();
@@ -97,7 +104,7 @@ namespace ChatClient
 				else if ("message".Equals(type))
 				{
 					l.log("new message");
-					Entities.MessageResponse m = dynamicToMessageResponse(resp);
+					Entities.MessageResponse m = Utils.dynamicToMessageResponse(resp);
 					while (mainWindow == null)
 					{
 						l.log("another sleep");
@@ -109,7 +116,7 @@ namespace ChatClient
 					// serialise
 					string channelName = m.channel;
 					var ent = new Entities.MessageEntity {from = m.@from, message = m.message, time = m.time};
-					using (var db = new LiteDatabase(@"LocalData.db"))
+					using (var db = new LiteDatabase(@Config.userName+"_local.db"))
 					{
 						var messagesCollection = db.GetCollection<Entities.MessageEntity>(channelName + "_mes");
 						messagesCollection.Insert(ent);
@@ -145,12 +152,12 @@ namespace ChatClient
 					JArray userCounts = resp.user_counts;
 					List<Int32> counts = userCounts.ToObject<List<Int32>>();
 					l.log("received counts: " + userCounts.ToString());
-					Dispatchers.dispatchShowChannels(chList, counts, mainWindow);
+					Dispatchers.dispatchGetChannels(chList, counts, mainWindow);
 				}
 
 				else if ("new_channel".Equals(type))
 				{
-					Entities.NewChannelResponse m = dynamicToNewChannelResponse(resp);
+					Entities.NewChannelResponse m = Utils.dynamicToNewChannelResponse(resp);
 					Dispatchers.dispatchCreateChannel(m, mainWindow);
 				}
 				else if ("get_channel_messages".Equals(type))
@@ -167,7 +174,7 @@ namespace ChatClient
 					var entities = listDynamicToMessageEntities(ll);
 					try
 					{
-						using (var db = new LiteDatabase(@"LocalData.db"))
+						using (var db = new LiteDatabase(Config.userName+"_local.db"))
 						{
 							var messagesCollection = db.GetCollection<Entities.MessageEntity>(ch + "_mes");
 							messagesCollection.EnsureIndex(x => x.time);
@@ -212,7 +219,7 @@ namespace ChatClient
 						if (evnt.user == Config.userName)
 						{
 							// show new channel
-							mainWindow.globalChannel.getChannelRequest(evnt.channel);
+							mainWindow.globalChannel.generateChannelRequest(evnt.channel);
 						}
 						// other members of channel (exclude admin)
 						else
@@ -266,30 +273,8 @@ namespace ChatClient
 			{
 				// about 2 second to connect
 				ws.Connect();
-				;
 			}
 			l.log("ws connected");
-		}
-
-		private Entities.MessageResponse dynamicToMessageResponse(dynamic obj)
-		{
-			string from = obj.from;
-			string type = obj.type;
-			long time = obj.time;
-			string message = obj.message;
-			string channel = obj.channel;
-			return new Entities.MessageResponse(type, message, from, time, channel);
-		}
-
-		private Entities.NewChannelResponse dynamicToNewChannelResponse(dynamic obj)
-		{
-			var ch = new Entities.NewChannelResponse();
-			ch.name = obj.name;
-			ch.fullname = obj.fullname;
-			ch.admin = obj.admin;
-			ch.success = obj.success;
-			ch.type = obj.type;
-			return ch;
 		}
 
 	}

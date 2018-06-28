@@ -14,14 +14,14 @@ namespace ChatClient
 		public static void dispatchGetChannelUsers(Entities.GetChannelUsers obj, MainWindow w)
 		{
 			w.Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				w.globalChannel.getChannelUsers(obj);
+				w.globalChannel.getChannelUsersReceived(obj);
 			}));
 		}
 
 		public static void dispatchGetOnlineUsers(Entities.GetOnlineUsers obj, MainWindow w)
 		{
 			w.Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				w.globalChannel.getOnlineUsers(obj);
+				w.globalChannel.getOnlineUsersReceived(obj);
 			}));
 		}
 
@@ -43,28 +43,28 @@ namespace ChatClient
 		public static void dispatchCreateChannel(Entities.NewChannelResponse m, MainWindow w)
 		{
 			w.Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				w.globalChannel.createChannel(m);
+				w.globalChannel.createChannelReceived(m);
 			}));
 		}
 
-		public static void dispatchShowChannels(List<dynamic> channels, List<Int32> counts, MainWindow w)
+		public static void dispatchGetChannels(List<dynamic> channels, List<Int32> counts, MainWindow w)
 		{
 			w.Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				w.globalChannel.showChannels(channels, counts);
+				w.globalChannel.getChannelsReceived(channels, counts);
 			}));
 		}
 
 		public static void dispatchShowMessage(Entities.MessageResponse mes, MainWindow w)
 		{
 			w.Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				w.globalMessages.showMessage(mes);
+				w.globalMessages.showMessageReceived(mes);
 			}));
 		}
 
 		public static void dispatchShowChannelMessages(string channelName, List<dynamic> messages, MainWindow w)
 		{
 			w.Dispatcher.BeginInvoke(new ThreadStart(delegate {
-				w.globalMessages.showChannelMessages(channelName, messages);
+				w.globalMessages.showChannelMessagesReceived(channelName, messages);
 			}));
 		}
 	}

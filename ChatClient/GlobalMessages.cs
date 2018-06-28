@@ -26,7 +26,7 @@ namespace ChatClient
 		/// <see cref="createChannelGrid"/>
 		/// </summary>
 		/// <returns>grid object with needed parameters</returns>
-		public Grid createMessageGrid(string name, string message, string time, Grid obj)
+		private Grid createMessageGrid(string name, string message, string time, Grid obj)
 		{
 			var g1 = GenericsWPF<Grid>.DeepDarkCopy(obj);
 			g1.Visibility = Visibility.Visible;
@@ -61,7 +61,7 @@ namespace ChatClient
 		}
 
 
-		public void readFromTextBoxAndSend()
+		public void readMessageFromTextBoxAndSendIt()
 		{
 			if (w.MessageTextBox.Text != "")
 			{
@@ -85,7 +85,7 @@ namespace ChatClient
 					ScrollMessageListToEnd();
 
 					// serialise
-					using (var db = new LiteDatabase(@"LocalData.db"))
+					using (var db = new LiteDatabase(@Config.userName+ "_local.db"))
 					{
 						var messages = db.GetCollection<Entities.MessageEntity>(mes.channel + "_mes");
 						var ent = new Entities.MessageEntity { from = mes.@from, message = mes.message, time = mes.time };
@@ -97,9 +97,9 @@ namespace ChatClient
 
 
 		/// <summary>
-		/// show new messages from server for current channel
+		/// show new message (one) from server for current channel
 		/// </summary>
-		public void showMessage(Entities.MessageResponse mes)
+		public void showMessageReceived(Entities.MessageResponse mes)
 		{
 			Grid ch = (Grid)w.ChannelList.SelectedItems[0];
 			string name = ((TextBlock)ch.Children[3]).Text;
@@ -120,14 +120,54 @@ namespace ChatClient
 		}
 
 
+		private void renderChannelMessages(List<dynamic> messages) 
+		{
+			foreach (dynamic m in messages)
+			{
+				string mes = m.message;
+				string fr = m.from;
+				long time = m.time;
+				Grid mGrid;
+				if (fr.Equals(Config.userName))
+				{
+					mGrid = createMyMessageGrid(mes, Utils.longToDateTime(time));
+				}
+				else
+				{
+					mGrid = createAnotherMessageGrid(fr, mes, Utils.longToDateTime(time));
+				}
+				w.MessageList.Items.Add(mGrid);
+				ScrollMessageListToEnd();
+			}
+		}
 
+		private void renderLocalChannelMessages(List<Entities.MessageEntity> messages)
+		{
+			foreach (Entities.MessageEntity m in messages)
+			{
+				string mes = m.message;
+				string fr = m.from;
+				long time = m.time;
+				Grid mGrid;
+				if (fr.Equals(Config.userName))
+				{
+					mGrid = createMyMessageGrid(mes, Utils.longToDateTime(time));
+				}
+				else
+				{
+					mGrid = createAnotherMessageGrid(fr, mes, Utils.longToDateTime(time));
+				}
+				w.MessageList.Items.Add(mGrid);
+				ScrollMessageListToEnd();
+			}
+		}
 
 		/// <summary>
 		/// display channel messages from server, if channel is chosen
 		/// </summary>
 		/// <param name="channelName"></param>
 		/// <param name="messages"></param>
-		public void showChannelMessages(string channelName, List<dynamic> messages)
+		public void showChannelMessagesReceived(string channelName, List<dynamic> messages)
 		{
 			// смотрим, какой канал сейчас выбран
 			Grid ch = (Grid)w.ChannelList.SelectedItems[0];
@@ -136,30 +176,14 @@ namespace ChatClient
 			{
 				//MessageList.Items.Clear();
 				// рендерим список сообщений
-				foreach (dynamic m in messages)
-				{
-					string mes = m.message;
-					string fr = m.from;
-					long time = m.time;
-					Grid mGrid;
-					if (fr.Equals(Config.userName))
-					{
-						mGrid = createMyMessageGrid(mes, Utils.longToDateTime(time));
-					}
-					else
-					{
-						mGrid = createAnotherMessageGrid(fr, mes, Utils.longToDateTime(time));
-					}
-					w.MessageList.Items.Add(mGrid);
-					ScrollMessageListToEnd();
-				}
+				renderChannelMessages(messages);
 			}
 		}
 
 
 
 
-		public void showChannelInnerMessages(string channelName, List<Entities.MessageEntity> messages)
+		public void showLocalChannelMessages(string channelName, List<Entities.MessageEntity> messages)
 		{
 			// смотрим, какой канал сейчас выбран
 			Grid ch = (Grid)w.ChannelList.SelectedItems[0];
@@ -167,72 +191,48 @@ namespace ChatClient
 			if (channelName == name)
 			{
 				// рендерим список сообщений
-				foreach (Entities.MessageEntity m in messages)
-				{
-					string mes = m.message;
-					string fr = m.from;
-					long time = m.time;
-					Grid mGrid;
-					if (fr.Equals(Config.userName))
-					{
-						mGrid = createMyMessageGrid(mes, Utils.longToDateTime(time));
-					}
-					else
-					{
-						mGrid = createAnotherMessageGrid(fr, mes, Utils.longToDateTime(time));
-					}
-					w.MessageList.Items.Add(mGrid);
-					ScrollMessageListToEnd();
-				}
+				renderLocalChannelMessages(messages);
 			}
 		}
 
-		public void findAndRequireMessages(string channelName)
+		private void requestChannelMessages(string channel, long from)
+		{
+			var ws = w.wsController.getWs();
+			if (ws != null)
+			{
+				var getChannelMessages = new Entities.GetChannelMessagesReq();
+				getChannelMessages.type = "get_channel_messages";
+				getChannelMessages.channel = channel;
+				getChannelMessages.from = Config.userName;
+				// запрашиваем с сервера сообщения где time > t
+				getChannelMessages.time = from;
+				string getChM = JsonConvert.SerializeObject(getChannelMessages);
+				ws.Send(getChM);
+			}
+		}
+
+
+		// loading once (first time clicking channel)
+		public void loadLocalAndRemoteChannelMessages(string channelName)
 		{
 			// resp: {message, from, channel, time, type: 'message'}
 			// храним: {message, from, time}
-			using (var db = new LiteDatabase(@"LocalData.db"))
+			using (var db = new LiteDatabase(@Config.userName + "_local.db"))
 			{
 				var messages = db.GetCollection<Entities.MessageEntity>(channelName + "_mes");
 
 				var mes = messages.FindAll();
 				mes = mes.OrderBy(x => x.time);
-
-				// отправляем запрос на все
-				if (mes.Count() == 0)
+				// отправляем запрос на все, если локальная база пуста
+				long from = 0;
+				if (mes.Count() != 0)
 				{
-					var ws = w.wsController.getWs();
-					if (ws != null)
-					{
-						var getChannelMessages = new Entities.GetChannelMessagesReq();
-						getChannelMessages.type = "get_channel_messages";
-						getChannelMessages.channel = channelName;
-						getChannelMessages.from = Config.userName;
-						string getChM = JsonConvert.SerializeObject(getChannelMessages);
-						ws.Send(getChM);
-					}
-				}
-				// запрашиваем с сервера только новые сообщения (время больше чем максимальное)
-				// и сразу их сериализуем
-				else
-				{
-					var t = mes.Last().time;
-					// запрашиваем с сервера сообщения где time > t
+					// запрашиваем с сервера только новые сообщения (время больше чем максимальное)
+					from = mes.Last().time;
 					// отображаем наши сообщения
-					showChannelInnerMessages(channelName, mes.ToList());
-					// все пришедшие с сервера сообщения записываем в конец
-					var ws = w.wsController.getWs();
-					if (ws != null)
-					{
-						var getChannelMessages = new Entities.GetChannelMessagesReq();
-						getChannelMessages.type = "get_channel_messages";
-						getChannelMessages.channel = channelName;
-						getChannelMessages.from = Config.userName;
-						getChannelMessages.time = t;
-						string getChM = JsonConvert.SerializeObject(getChannelMessages);
-						ws.Send(getChM);
-					}
+					showLocalChannelMessages(channelName, mes.ToList());
 				}
+				requestChannelMessages(channelName, from);
 			}
 		}
 	}
